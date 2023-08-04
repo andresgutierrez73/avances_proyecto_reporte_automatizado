@@ -32,6 +32,12 @@ namespace funcionalidades_documento.edicion_footer_header
             }
         }
 
+        /// <summary>
+        /// Método para establecer el encabezado con el formato del documento
+        /// </summary>
+        /// <param name="titulo">Aquí va a el texto que se puede ver arriba en el encabezado</param>
+        /// <param name="preTitulo">Aquí va a el texto que se puede ver abajo en el encabezado</param>
+        /// <returns></returns>
         public static Header NewHeader(string titulo, string preTitulo)
         {
             Header header = new Header();
@@ -129,6 +135,14 @@ namespace funcionalidades_documento.edicion_footer_header
             return header;
         }
 
+        /// <summary>
+        /// Método para añadir en encabezado en el documento de word a partir del formato del metodo anterior
+        /// </summary>
+        /// <param name="ruta">Aquí va la ruta del documento de word</param>
+        /// <param name="textoAbajo">Aquí va el texto que esta en la parte baja del texto</param>
+        /// <param name="textoArriba">Aquí va el texto que esta en la parte alta del texto</param>
+        /// <param name="altura">Aquí va la altura que va a tener el encabezado, lo mejor es usar el valor de 2</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public static void EditarEncabezado(string ruta, string textoAbajo, string textoArriba, double altura)
         {
             ValidarRutaArchivo(ruta);
@@ -192,22 +206,65 @@ namespace funcionalidades_documento.edicion_footer_header
             }
         }
 
-        public static Footer NewFooter(string texto)
+        public static Footer NewFooter(string footerText)
         {
             Footer footer = new Footer();
 
-            // Agregar declaraciones de espacio de nombres si es necesario
-            // ...
+            #region NameSpaces
+            footer.AddNamespaceDeclaration("wpc", "http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas");
+            footer.AddNamespaceDeclaration("mc", "http://schemas.openxmlformats.org/markup-compatibility/2006");
+            footer.AddNamespaceDeclaration("o", "urn:schemas-microsoft-com:office:office");
+            footer.AddNamespaceDeclaration("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
+            footer.AddNamespaceDeclaration("m", "http://schemas.openxmlformats.org/officeDocument/2006/math");
+            footer.AddNamespaceDeclaration("v", "urn:schemas-microsoft-com:vml");
+            footer.AddNamespaceDeclaration("wp14", "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing");
+            footer.AddNamespaceDeclaration("wp", "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing");
+            footer.AddNamespaceDeclaration("w10", "urn:schemas-microsoft-com:office:word");
+            footer.AddNamespaceDeclaration("w", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
+            footer.AddNamespaceDeclaration("w14", "http://schemas.microsoft.com/office/word/2010/wordml");
+            footer.AddNamespaceDeclaration("wpg", "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup");
+            footer.AddNamespaceDeclaration("wpi", "http://schemas.microsoft.com/office/word/2010/wordprocessingInk");
+            footer.AddNamespaceDeclaration("wne", "http://schemas.microsoft.com/office/word/2006/wordml");
+            footer.AddNamespaceDeclaration("wps", "http://schemas.microsoft.com/office/word/2010/wordprocessingShape");
+            #endregion
 
-            // Crear un párrafo con el texto del pie de página
-            Paragraph paragraph = new Paragraph(
-                new Run(
-                    new Text(texto)
+            Table footerTable = new Table(new TableProperties(
+                new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct },
+                new TableBorders(
+                    new TopBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 10 },
+
+                    new BottomBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
+                    new LeftBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
+                    new RightBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
+                    new InsideVerticalBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
+                    new InsideHorizontalBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 }
+                ),
+                new TableCellMarginDefault(
+                    new TopMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
+                    new StartMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
+                    new BottomMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
+                    new EndMargin() { Width = "0", Type = TableWidthUnitValues.Dxa }
+                )
+            ));
+
+            TableRow footerRow1 = new TableRow();
+            TableCell footerCell11 = new TableCell(
+                new Paragraph(
+                    new ParagraphProperties(
+                        new Justification() { Val = JustificationValues.Right },
+                        new SpacingBetweenLines() { Before = "0", After = "22" },
+                        new Languages() { Val = "es-ES" }
+                    ),
+                    new Run(
+                        new RunProperties(new FontSize() { Val = "18" }, new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" }),
+                        new Text(footerText)
+                    )
                 )
             );
 
-            // Agregar el párrafo al pie de página
-            footer.Append(paragraph);
+            footerRow1.Append(footerCell11);
+            footerTable.Append(footerRow1);
+            footer.Append(footerTable);
 
             return footer;
         }

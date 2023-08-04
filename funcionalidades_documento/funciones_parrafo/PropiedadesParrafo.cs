@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Word = Microsoft.Office.Interop.Word;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -452,5 +453,119 @@ namespace funcionalidades_documento.funciones_parrafo
 
             Console.WriteLine("Agregando tabla de contenido al documento.");
         }
+
+        public static void AgregarParrafoConCita(string ruta, string texto, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion, string cita)
+        {
+            tamanoFuente *= 2;
+
+            ValidarRutaArchivo(ruta);
+
+            // Primero, abre el documento con OpenXML y agrega el párrafo
+            using (var document = WordprocessingDocument.Open(ruta, true))
+            {
+                if (document == null)
+                {
+                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
+                }
+
+                var body = document.MainDocumentPart.Document.Body;
+
+                var runProperties = new RunProperties(new FontSize { Val = tamanoFuente.ToString() });
+
+                // Aplicar el estilo correspondiente
+                switch (estilo)
+                {
+                    case EstiloParrafo.Normal:
+                        break;
+                    case EstiloParrafo.Negrita:
+                        runProperties.Append(new Bold());
+                        break;
+                    case EstiloParrafo.Italico:
+                        runProperties.Append(new Italic());
+                        break;
+                    case EstiloParrafo.Subrayado:
+                        runProperties.Append(new Underline { Val = UnderlineValues.Single });
+                        break;
+                    default:
+                        break;
+                }
+
+                var run = new Run(runProperties, new Text(texto));
+                var paragraph = new Paragraph(run);
+
+                // Aplicar la alineación correspondiente
+                switch (alineacion)
+                {
+                    case AlineacionTexto.Izquierda:
+                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Left });
+                        break;
+                    case AlineacionTexto.Derecha:
+                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Right });
+                        break;
+                    case AlineacionTexto.Centro:
+                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Center });
+                        break;
+                    case AlineacionTexto.Justificado:
+                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Both });
+                        break;
+                    default:
+                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Left });
+                        break;
+                }
+
+                body.AppendChild(paragraph);
+                document.MainDocumentPart.Document.Save();
+            }
+
+            // Luego, abre el documento con Interop y agrega la cita
+            Word.Application wordApp = new Word.Application();
+            Word.Document docInterop = wordApp.Documents.Open(ruta);
+            Word.Range range = docInterop.Content;
+            range.Find.Execute(texto, MatchWholeWord: true);
+            Word.Range citationRange = range.Paragraphs[1].Range;
+            citationRange.InsertAfter($" ({cita})");
+            docInterop.Save();
+            docInterop.Close();
+            wordApp.Quit();
+        }
+
+        public static void AgregarBibliografia(string ruta, List<string> citas)
+        {
+            ValidarRutaArchivo(ruta);
+
+            using (var document = WordprocessingDocument.Open(ruta, true))
+            {
+                if (document == null)
+                {
+                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
+                }
+
+                var body = document.MainDocumentPart.Document.Body;
+
+                // Crear una nueva tabla
+                Table table = new Table();
+
+                // Crear la fila del encabezado
+                TableRow headerRow = new TableRow();
+                TableCell headerCell = new TableCell(new Paragraph(new Run(new Text("Citas Bibliográficas"))));
+                headerRow.Append(headerCell);
+                table.Append(headerRow);
+
+                // Añadir una fila para cada cita
+                foreach (var cita in citas)
+                {
+                    TableRow row = new TableRow();
+                    TableCell cell = new TableCell(new Paragraph(new Run(new Text(cita))));
+                    row.Append(cell);
+                    table.Append(row);
+                }
+
+                body.Append(table);
+                document.MainDocumentPart.Document.Save();
+            }
+
+            Console.WriteLine("Tabla de bibliografía añadida al documento.");
+        }
+
     }
 }

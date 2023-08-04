@@ -40,9 +40,7 @@ namespace inicializador_proyecto
                 FuncionesCreacion.GenerarDocumentoWord(ruta);
 
                 EditarEncabezadoPie.EditarEncabezado(ruta, "Este es el encabezado", "Esta es la parte baja del texto", 2);
-                EditarEncabezadoPie.EditarPieDePagina(ruta, "Este es el texto del pie");
-                //EditarEncabezadoPie.EliminarEncabezado(ruta, 1);
-                //EditarEncabezadoPie.EliminarPieDePagina(ruta, 1);
+                EditarEncabezadoPie.EditarPieDePagina(ruta, "Diseño de estructura metalmecánica");
 
                 #region Aquí se va a crear la portada APA
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 5);
@@ -56,29 +54,35 @@ namespace inicializador_proyecto
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
                 #endregion
 
-                EditarEncabezadoPie.EditarEncabezado(ruta, "Este es el encabezado2", "Esta es la parte baja del texto", 2);
-
-
                 #region Aquí se va a llamar a la tabla de contenido
                 PropiedadesParrafo.TablaContenido(ruta, "Tabla de contenido IEB");
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
                 #endregion
 
                 #region Aquí va esta el contenido del cuerpo del documento
-                for (int i = 0; i < 9; i++)
+                PropiedadesParrafo.AgregarTitulo(ruta, "Noticias IEB", 1, 12, EstiloParrafo.Negrita, AlineacionTexto.Izquierda);
+                PropiedadesParrafo.AgregarTitulo(ruta, "IEB presente en la cita con el ministro de minas y energía en Medellín", 2, 12, EstiloParrafo.Negrita, AlineacionTexto.Izquierda);
+                textoAleatorio = Lorem.Paragraph(4, 20);
+                PropiedadesParrafo.AgregarParrafo(ruta, textoAleatorio, 12, EstiloParrafo.Normal, AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                rutaImagen = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + $"\\documento_aleatorio\\1.jpg";
+                PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaImagen, 10, 10, AlineacionImagen.Centro);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                textoAleatorio = Lorem.Paragraph(4, 8);
+
+                PropiedadesParrafo.AgregarParrafo(ruta, textoAleatorio, 12, EstiloParrafo.Normal, AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltoDePagina(ruta);
+
+                PropiedadesParrafo.AgregarParrafoConCita(ruta, "este es un ejemplo de una citacion", 12, EstiloParrafo.Italico, AlineacionTexto.Izquierda, "Andres Juan");
+                PropiedadesParrafo.AgregarSaltoDePagina(ruta);
+
+                List<string> citas = new List<string>
                 {
-                    PropiedadesParrafo.AgregarTitulo(ruta, "Noticias IEB", 1, 12, EstiloParrafo.Negrita, AlineacionTexto.Izquierda);
-                    PropiedadesParrafo.AgregarTitulo(ruta, "IEB presente en la cita con el ministro de minas y energía en Medellín", 2, 12, EstiloParrafo.Negrita, AlineacionTexto.Izquierda);
-                    textoAleatorio = Lorem.Paragraph(4, 30);
-                    PropiedadesParrafo.AgregarParrafo(ruta, textoAleatorio, 12, EstiloParrafo.Normal, AlineacionTexto.Justificado);
-                    PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
-                    rutaImagen = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + $"\\documento_aleatorio\\{i}.jpg";
-                    PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaImagen, 10, 10, AlineacionImagen.Centro);
-                    PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
-                    textoAleatorio = Lorem.Paragraph(4, 8);
-                    PropiedadesParrafo.AgregarParrafo(ruta, textoAleatorio, 12, EstiloParrafo.Normal, AlineacionTexto.Justificado);
-                    PropiedadesParrafo.AgregarSaltoDePagina(ruta);
-                }
+                    "Autor1. (Año1). Título1. Editorial1.",
+                    "Autor2. (Año2). Título2. Editorial2."
+                };
+
+                PropiedadesParrafo.AgregarBibliografia("ruta_a_tu_documento.docx", citas);
                 #endregion
             }
             catch (Exception ex)
