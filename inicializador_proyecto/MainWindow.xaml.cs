@@ -73,16 +73,7 @@ namespace inicializador_proyecto
                 PropiedadesParrafo.AgregarParrafo(ruta, textoAleatorio, 12, EstiloParrafo.Normal, AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
 
-                PropiedadesParrafo.AgregarParrafoConCita(ruta, "este es un ejemplo de una citacion", 12, EstiloParrafo.Italico, AlineacionTexto.Izquierda, "Andres Juan");
-                PropiedadesParrafo.AgregarSaltoDePagina(ruta);
-
-                List<string> citas = new List<string>
-                {
-                    "Autor1. (Año1). Título1. Editorial1.",
-                    "Autor2. (Año2). Título2. Editorial2."
-                };
-
-                PropiedadesParrafo.AgregarBibliografia("ruta_a_tu_documento.docx", citas);
+                PropiedadesParrafo.AgregarParrafoConCita(ruta, "este es un texto con referencia", 12, EstiloParrafo.Italico, AlineacionTexto.Izquierda, "Andres Juan", "gutierrez", "2022");
                 #endregion
             }
             catch (Exception ex)
