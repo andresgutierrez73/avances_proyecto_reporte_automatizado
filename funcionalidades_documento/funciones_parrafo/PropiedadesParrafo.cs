@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Word = Microsoft.Office.Interop.Word;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,6 @@ namespace funcionalidades_documento.funciones_parrafo
                 throw new ArgumentException("La ruta debe tener una extensión .docx");
             }
         }
-
         /// <summary>
         /// Método para agregar un párrafo con estilo y alineación indicados al documento
         /// </summary>
@@ -146,7 +146,6 @@ namespace funcionalidades_documento.funciones_parrafo
                 numberingPart.Numbering.Append(numberingInstance);
             }
         }
-
         /// <summary>
         /// Método para agregar un título con nivel específico y estilo personalizado
         /// </summary>
@@ -330,43 +329,6 @@ namespace funcionalidades_documento.funciones_parrafo
         }
 
         /// <summary>
-        /// Método para agregar una cita bibliográfica al final del documento
-        /// </summary>
-        /// <param name="ruta">Aquí va la ruta del documento de word</param>
-        /// <param name="autor">Aquí se pasa el nombre del autor</param>
-        /// <param name="titulo">Aquí se pasa el título dle artículo o de la fuente de información</param>
-        /// <param name="publicador">Aquí se pone el nombre de la empresa o lugar donde trabaja el autor</param>
-        /// <param name="fechaPublicacion">Aquí se pasa la fecha de publicación</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static void AgregarCitaBibliografica(string ruta, string autor, string titulo, string publicador, string fechaPublicacion)
-        {
-            ValidarRutaArchivo(ruta);
-
-            // Definimos la variable que contendrá la cita
-            string citaBibliografica = "";
-
-            using (var document = WordprocessingDocument.Open(ruta, true))
-            {
-                if (document == null)
-                {
-                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
-                }
-
-                var body = document.MainDocumentPart.Document.Body;
-
-                // Formato de cita bibliográfica APA
-                citaBibliografica = $"{autor}. ({fechaPublicacion}). {titulo}. {publicador}.";
-
-                var run = new Run(new Text(citaBibliografica));
-                var paragraph = new Paragraph(run);
-
-                body.AppendChild(paragraph);
-            }
-
-            Console.WriteLine("Agregando cita bibliográfica al documento: " + citaBibliografica);
-        }
-
-        /// <summary>
         /// Método para la creación de una tabla de contenido
         /// </summary>
         /// <param name="ruta">Aquí va la ruta del documento de word</param>
@@ -451,6 +413,118 @@ namespace funcionalidades_documento.funciones_parrafo
             }
 
             Console.WriteLine("Agregando tabla de contenido al documento.");
+        }
+
+        /// <summary>
+        /// Método para agregar una referencia / cita a un parrafo
+        /// </summary>
+        /// <param name="ruta">Aquí va a la ruta del documento de word</param>
+        /// <param name="texto">Aquí va a el texto del parrafo que se va a mostrar</param>
+        /// <param name="tamanoFuente">Aquí se inserta el tamaño de la fuente del parrafo</param>
+        /// <param name="estilo">Aquí se pasa un enum con los valores constantes de estilos</param>
+        /// <param name="alineacion">Aquí se pasa un enum con los valores constantes de alineación</param>
+        /// <param name="nombreAutor">Aquí va el nombre del autor al cual se esta citando</param>
+        /// <param name="apellidoAutor">Aquí va el apellido del autor al cual se esta citando</param>
+        /// <param name="año">Aquí se inserta el año de a referencia</param>
+        /// <param name="tituloLibro">Aquí se inserta un valor opcional con el nombre del libro</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static void AgregarParrafoConCita(string ruta, string texto, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion, string nombreAutor, string apellidoAutor, string año, string tituloLibro = "")
+        {
+            tamanoFuente *= 2;
+
+            ValidarRutaArchivo(ruta);
+
+            // Primero, abre el documento con OpenXML y agrega el párrafo
+            using (var document = WordprocessingDocument.Open(ruta, true))
+            {
+                if (document == null)
+                {
+                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
+                }
+
+                var body = document.MainDocumentPart.Document.Body;
+
+                var runProperties = new RunProperties(new FontSize { Val = tamanoFuente.ToString() });
+
+                // Aplicar el estilo correspondiente
+                switch (estilo)
+                {
+                    case EstiloParrafo.Normal:
+                        break;
+                    case EstiloParrafo.Negrita:
+                        runProperties.Append(new Bold());
+                        break;
+                    case EstiloParrafo.Italico:
+                        runProperties.Append(new Italic());
+                        break;
+                    case EstiloParrafo.Subrayado:
+                        runProperties.Append(new Underline { Val = UnderlineValues.Single });
+                        break;
+                    default:
+                        break;
+                }
+
+                var run = new Run(runProperties, new Text(texto));
+                var paragraph = new Paragraph(run);
+
+                // Aplicar la alineación correspondiente
+                switch (alineacion)
+                {
+                    case AlineacionTexto.Izquierda:
+                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Left });
+                        break;
+                    case AlineacionTexto.Derecha:
+                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Right });
+                        break;
+                    case AlineacionTexto.Centro:
+                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Center });
+                        break;
+                    case AlineacionTexto.Justificado:
+                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Both });
+                        break;
+                    default:
+                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Left });
+                        break;
+                }
+
+                body.AppendChild(paragraph);
+                document.MainDocumentPart.Document.Save();
+            }
+
+            // Luego, abre el documento con Interop y agrega la cita
+            Word.Application wordApp = new Word.Application();
+            Word.Document docInterop = wordApp.Documents.Open(ruta);
+
+            // Buscar el final del documento
+            Word.Range citationRange = docInterop.Content;
+            citationRange.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+
+            // Agregar la fuente bibliográfica
+            string tag = "MyTag";
+            string sourceXML = $@"<b:Source xmlns:b=""http://schemas.openxmlformats.org/officeDocument/2006/bibliography"">
+                    <b:Tag>{tag}</b:Tag>
+                    <b:SourceType>Book</b:SourceType>
+                    <b:Author>
+                        <b:Author>
+                            <b:NameList>
+                                <b:Person>
+                                    <b:Last>{apellidoAutor}</b:Last>
+                                    <b:First>{nombreAutor}</b:First>
+                                </b:Person>
+                            </b:NameList>
+                        </b:Author>
+                    </b:Author>
+                    <b:Title>{tituloLibro}</b:Title>
+                    <b:Year>{año}</b:Year>
+                </b:Source>";
+            docInterop.Bibliography.Sources.Add(sourceXML);
+
+            // Insertar la cita
+            citationRange.Fields.Add(citationRange, Word.WdFieldType.wdFieldCitation, tag, true);
+
+            docInterop.Save();
+            docInterop.Close();
+            wordApp.Quit();
         }
     }
 }

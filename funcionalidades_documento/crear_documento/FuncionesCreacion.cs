@@ -19,9 +19,15 @@ namespace funcionalidades_documento.crear_documento
         /// <returns>Retorna la ruta del directorio en el que se va a guardar el documento</returns>
         public static string GuardarRuta()
         {
+            // Obtenemos la fecha actual
+            DateTime fechaActual = DateTime.Now;
+
+            // Damos formato a la fecha actual
+            string ferchaConFormato = fechaActual.ToString("yyyyMMdd");
+
             var createFile = new Microsoft.Win32.SaveFileDialog()
             {
-                FileName = "documento_prueba.docx",
+                FileName = $"documento_prueba.docx",
                 Filter = "Word Files (*.docx)|*.docx",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                 DefaultExt = "docx"
