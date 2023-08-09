@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static funcionalidades_documento.crear_documento.FuncionesCreacion;
+using System.Runtime.InteropServices;
 
 namespace funcionalidades_documento.funciones_parrafo
 {
@@ -428,7 +429,7 @@ namespace funcionalidades_documento.funciones_parrafo
         /// <param name="año">Aquí se inserta el año de a referencia</param>
         /// <param name="tituloLibro">Aquí se inserta un valor opcional con el nombre del libro</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void AgregarParrafoConCita(string ruta, string texto, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion, string nombreAutor, string apellidoAutor, string año, string tituloLibro = "")
+        public static void AgregarParrafoConCita(string ruta, string texto, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion, string nombreCita, string nombreAutor, string apellidoAutor, string año, string tituloLibro = "")
         {
             tamanoFuente *= 2;
 
@@ -495,12 +496,16 @@ namespace funcionalidades_documento.funciones_parrafo
             Word.Application wordApp = new Word.Application();
             Word.Document docInterop = wordApp.Documents.Open(ruta);
 
+            // Configurar el formato de las citas y bibliografía a IEEE
+            docInterop.Bibliography.BibliographyStyle = "IEEE";
+
             // Buscar el final del documento
             Word.Range citationRange = docInterop.Content;
             citationRange.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
 
+
             // Agregar la fuente bibliográfica
-            string tag = "MyTag";
+            string tag = nombreCita;
             string sourceXML = $@"<b:Source xmlns:b=""http://schemas.openxmlformats.org/officeDocument/2006/bibliography"">
                     <b:Tag>{tag}</b:Tag>
                     <b:SourceType>Book</b:SourceType>
@@ -526,5 +531,45 @@ namespace funcionalidades_documento.funciones_parrafo
             docInterop.Close();
             wordApp.Quit();
         }
+
+        public static void InsertarBibliografia(string ruta)
+        {
+            ValidarRutaArchivo(ruta);
+
+            Word.Application wordApp = null;
+            Word.Document doc = null;
+
+            try
+            {
+                wordApp = new Word.Application();
+                doc = wordApp.Documents.Open(ruta);
+
+                // Buscar el final del documento para insertar la bibliografía
+                Word.Range bibliographyRange = doc.Content;
+                bibliographyRange.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+
+                // Cambiar el estilo de la bibliografía a IEEE
+                Word.Bibliography bib = doc.Bibliography;
+                bib.BibliographyStyle = "IEEE";
+                bibliographyRange.Fields.Add(bibliographyRange, Word.WdFieldType.wdFieldBibliography);
+
+                doc.Save();
+            }
+            finally
+            {
+                if (doc != null)
+                {
+                    doc.Close();
+                    Marshal.ReleaseComObject(doc);
+                }
+                if (wordApp != null)
+                {
+                    wordApp.Quit();
+                    Marshal.ReleaseComObject(wordApp);
+                }
+            }
+        }
+
+
     }
 }

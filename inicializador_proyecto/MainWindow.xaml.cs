@@ -60,20 +60,27 @@ namespace inicializador_proyecto
                 #endregion
 
                 #region Aquí va esta el contenido del cuerpo del documento
-                PropiedadesParrafo.AgregarTitulo(ruta, "Noticias IEB", 1, 12, EstiloParrafo.Negrita, AlineacionTexto.Izquierda);
-                PropiedadesParrafo.AgregarTitulo(ruta, "IEB presente en la cita con el ministro de minas y energía en Medellín", 2, 12, EstiloParrafo.Negrita, AlineacionTexto.Izquierda);
-                textoAleatorio = Lorem.Paragraph(4, 20);
-                PropiedadesParrafo.AgregarParrafo(ruta, textoAleatorio, 12, EstiloParrafo.Normal, AlineacionTexto.Justificado);
-                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
-                rutaImagen = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + $"\\documento_aleatorio\\1.jpg";
-                PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaImagen, 10, 10, AlineacionImagen.Centro);
-                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
-                textoAleatorio = Lorem.Paragraph(4, 8);
+                for (int i = 0; i < 7; i++)
+                {
+                    PropiedadesParrafo.AgregarTitulo(ruta, "Noticias IEB", 1, 12, EstiloParrafo.Negrita, AlineacionTexto.Izquierda);
+                    PropiedadesParrafo.AgregarTitulo(ruta, "IEB presente en la cita con el ministro de minas y energía en Medellín", 2, 12, EstiloParrafo.Negrita, AlineacionTexto.Izquierda);
+                    textoAleatorio = Lorem.Paragraph(4, 20);
+                    PropiedadesParrafo.AgregarParrafoConCita(ruta, textoAleatorio, 12, EstiloParrafo.Italico, AlineacionTexto.Izquierda, $"cita{i}", "Andres Juan", "Gutierrez", "2020");
+                    PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                    rutaImagen = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + $"\\documento_aleatorio\\{i}.jpg";
+                    PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaImagen, 10, 10, AlineacionImagen.Centro);
+                    PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                    textoAleatorio = Lorem.Paragraph(4, 8);
 
-                PropiedadesParrafo.AgregarParrafo(ruta, textoAleatorio, 12, EstiloParrafo.Normal, AlineacionTexto.Justificado);
-                PropiedadesParrafo.AgregarSaltoDePagina(ruta);
-
-                PropiedadesParrafo.AgregarParrafoConCita(ruta, "este es un texto con referencia", 12, EstiloParrafo.Italico, AlineacionTexto.Izquierda, "Andres Juan", "gutierrez", "2022");
+                    PropiedadesParrafo.AgregarParrafoConCita(ruta, textoAleatorio, 12, EstiloParrafo.Italico, AlineacionTexto.Izquierda, $"cita1.{i}", "Andres Juan", "Gutierrez", "2020");
+                    PropiedadesParrafo.AgregarSaltoDePagina(ruta);
+                    
+                }
+                PropiedadesParrafo.AgregarTitulo(ruta, "Referencias bibliograficas", 1, 12, EstiloParrafo.Negrita, AlineacionTexto.Izquierda);
+                //PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                PropiedadesParrafo.InsertarBibliografia(ruta);
+                
+                
                 #endregion
             }
             catch (Exception ex)
