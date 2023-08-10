@@ -50,10 +50,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="componentes_reporte\CreacionReporteAutomatizado.cs" />
     <Compile Include="crear_documento\FuncionesCreacion.cs" />
     <Compile Include="edicion_footer_header\EditarEncabezadoPie.cs" />
     <Compile Include="funciones_imagenes\PropiedadesImagen.cs" />
-    <Compile Include="funciones_parrafo\PropiedadesCitas.cs" />
     <Compile Include="funciones_parrafo\PropiedadesParrafo.cs" />
     <Compile Include="funciones_tablas\PropiedadesTabla.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

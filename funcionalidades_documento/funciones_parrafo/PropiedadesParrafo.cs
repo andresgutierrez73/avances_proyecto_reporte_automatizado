@@ -147,6 +147,7 @@ namespace funcionalidades_documento.funciones_parrafo
                 numberingPart.Numbering.Append(numberingInstance);
             }
         }
+
         /// <summary>
         /// Método para agregar un título con nivel específico y estilo personalizado
         /// </summary>
@@ -532,6 +533,10 @@ namespace funcionalidades_documento.funciones_parrafo
             wordApp.Quit();
         }
 
+        /// <summary>
+        /// Método para hacer la bibliografía con el formato IEEE
+        /// </summary>
+        /// <param name="ruta">Aquí va a la ruta del documento</param>
         public static void InsertarBibliografia(string ruta)
         {
             ValidarRutaArchivo(ruta);
@@ -569,7 +574,5 @@ namespace funcionalidades_documento.funciones_parrafo
                 }
             }
         }
-
-
     }
 }

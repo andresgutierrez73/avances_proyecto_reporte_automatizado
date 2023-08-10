@@ -31,13 +31,8 @@ namespace funcionalidades_documento.funciones_tablas
             }
         }
 
-        /// <summary>
-        /// Método para agregar una tabla
-        /// </summary>
-        /// <param name="ruta">Aquí va la ruta del docuemento de word</param>
-        /// <param name="listaFilas">Aquí va un array con el contenido que va a ir en la tabla</param>
-        /// <param name="listaColumnas">Aquí va un array con array con los encabezados</param>
-        public static void AgregarTabla(string ruta, List<string> listaFilas, List<string> listaColumnas)
+
+        public static void AgregarTabla(string ruta, List<List<string>> listaDatos, List<string> listaColumnas)
         {
             ValidarRutaArchivo(ruta);
 
@@ -66,7 +61,6 @@ namespace funcionalidades_documento.funciones_tablas
                     new DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 1 }
                 );
 
-
                 DocumentFormat.OpenXml.Wordprocessing.TableProperties tblProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties(tableWidth, tblBorders);
                 table.Append(tblProperties);
 
@@ -86,15 +80,18 @@ namespace funcionalidades_documento.funciones_tablas
                 table.Append(headerRow);
 
                 // Crea las filas y columnas restantes
-                for (int i = 0; i < listaFilas.Count; i++)
+                int maxRowCount = listaDatos.Max(list => list.Count);
+                for (int i = 0; i < maxRowCount; i++)
                 {
                     DocumentFormat.OpenXml.Wordprocessing.TableRow row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
                     for (int j = 0; j < listaColumnas.Count; j++)
                     {
+                        var cellValue = i < listaDatos[j].Count ? listaDatos[j][i] : string.Empty;
+
                         DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell(
                             new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
                                 new DocumentFormat.OpenXml.Wordprocessing.Run(
-                                    new DocumentFormat.OpenXml.Wordprocessing.Text(listaFilas[i])
+                                    new DocumentFormat.OpenXml.Wordprocessing.Text(cellValue)
                                 )
                             )
                         );
@@ -109,7 +106,9 @@ namespace funcionalidades_documento.funciones_tablas
                 document.MainDocumentPart.Document.Save();
             }
 
-            Console.WriteLine($"Se agregó una tabla de {listaFilas.Count + 1} filas y {listaColumnas.Count} columnas al documento.");
+            Console.WriteLine($"Se agregó una tabla al documento.");
         }
+
+
     }
 }

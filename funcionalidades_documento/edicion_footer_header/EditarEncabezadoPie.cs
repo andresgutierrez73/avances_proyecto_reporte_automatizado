@@ -38,7 +38,7 @@ namespace funcionalidades_documento.edicion_footer_header
         /// <param name="titulo">Aquí va a el texto que se puede ver arriba en el encabezado</param>
         /// <param name="preTitulo">Aquí va a el texto que se puede ver abajo en el encabezado</param>
         /// <returns></returns>
-        public static Header NewHeader(string titulo, string preTitulo)
+        public static Header nuevoEncabezado(string titulo, string preTitulo)
         {
             Header header = new Header();
 
@@ -170,7 +170,7 @@ namespace funcionalidades_documento.edicion_footer_header
                     mainPart.Document.Save();
                 }
 
-                var header = NewHeader(textoArriba, textoAbajo);
+                var header = nuevoEncabezado(textoArriba, textoAbajo);
                 var paragraphProperties = header.Descendants<ParagraphProperties>().FirstOrDefault();
                 if (paragraphProperties == null)
                 {
@@ -193,20 +193,25 @@ namespace funcionalidades_documento.edicion_footer_header
                 if (mainPart.Document.Body.Elements<SectionProperties>().Any())
                 {
                     SectionProperties sectionProperties = mainPart.Document.Body.Elements<SectionProperties>().First();
-                    HeaderReference headerReference = new HeaderReference { Id = mainPart.GetIdOfPart(headerPart) };
+                    HeaderReference headerReference = new HeaderReference { Id = mainPart.GetIdOfPart(headerPart), Type = HeaderFooterValues.Default }; // Tipo por defecto
                     sectionProperties.RemoveAllChildren<HeaderReference>();
                     sectionProperties.PrependChild(headerReference);
+
+                    // Configurar el encabezado diferente para la primera página
+                    TitlePage titlePage = new TitlePage();
+                    sectionProperties.RemoveAllChildren<TitlePage>();
+                    sectionProperties.PrependChild(titlePage);
                 }
                 else
                 {
-                    mainPart.Document.Body.Append(new SectionProperties(new HeaderReference { Id = mainPart.GetIdOfPart(headerPart) }));
+                    mainPart.Document.Body.Append(new SectionProperties(new HeaderReference { Id = mainPart.GetIdOfPart(headerPart), Type = HeaderFooterValues.Default }, new TitlePage()));
                 }
 
                 document.Save();
             }
         }
 
-        public static Footer NewFooter(string footerText)
+        public static Footer nuevoPie(string textoPie)
         {
             Footer footer = new Footer();
 
@@ -257,7 +262,7 @@ namespace funcionalidades_documento.edicion_footer_header
                     ),
                     new Run(
                         new RunProperties(new FontSize() { Val = "18" }, new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" }),
-                        new Text(footerText)
+                        new Text(textoPie)
                     )
                 )
             );
@@ -293,7 +298,7 @@ namespace funcionalidades_documento.edicion_footer_header
                     mainPart.Document.Save();
                 }
 
-                var footer = NewFooter(texto);
+                var footer = nuevoPie(texto);
 
                 footerPart.Footer = footer;
 
