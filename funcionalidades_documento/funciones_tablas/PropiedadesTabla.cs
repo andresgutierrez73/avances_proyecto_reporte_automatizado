@@ -32,7 +32,7 @@ namespace funcionalidades_documento.funciones_tablas
         }
 
 
-        public static void AgregarTabla(string ruta, List<List<string>> listaDatos, List<string> listaColumnas)
+        public static void AgregarTablaDatosGrandes(string ruta, List<List<string>> listaDatos, List<string> listaColumnas)
         {
             ValidarRutaArchivo(ruta);
 
@@ -109,6 +109,86 @@ namespace funcionalidades_documento.funciones_tablas
             Console.WriteLine($"Se agregó una tabla al documento.");
         }
 
+        public static void AgregarTablaDesdeLista(string ruta, List<List<string>> datos)
+        {
+            if (datos == null || !datos.Any())
+            {
+                throw new ArgumentNullException(nameof(datos), "Los datos no pueden ser nulos o vacíos.");
+            }
+
+            int columnCount = datos[0].Count;
+            if (!datos.All(row => row.Count == columnCount))
+            {
+                throw new ArgumentException("Todas las listas internas deben tener la misma longitud.");
+            }
+
+            ValidarRutaArchivo(ruta);
+
+            using (var document = WordprocessingDocument.Open(ruta, true))
+            {
+                if (document == null)
+                {
+                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
+                }
+
+                var body = document.MainDocumentPart.Document.Body;
+
+                // Crea la tabla
+                DocumentFormat.OpenXml.Wordprocessing.Table table = new DocumentFormat.OpenXml.Wordprocessing.Table();
+
+                // Define el ancho de la tabla al 100% del ancho del documento
+                TableWidth tableWidth = new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct };
+
+                // Define los bordes de la tabla
+                DocumentFormat.OpenXml.Wordprocessing.TableBorders tblBorders = new DocumentFormat.OpenXml.Wordprocessing.TableBorders(
+                    new DocumentFormat.OpenXml.Wordprocessing.TopBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.BottomBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.LeftBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.RightBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 }
+                );
+
+                DocumentFormat.OpenXml.Wordprocessing.TableProperties tblProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
+                tblProperties.Append(tableWidth);
+                tblProperties.Append(tblBorders);
+                table.Append(tblProperties);
+
+                // Añadir las filas desde datos
+                foreach (var rowData in datos)
+                {
+                    DocumentFormat.OpenXml.Wordprocessing.TableRow row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+                    foreach (var cellData in rowData)
+                    {
+                        DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
+
+                        // Alineación horizontal y vertical al centro
+                        DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
+                        DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties paragraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(
+                            new DocumentFormat.OpenXml.Wordprocessing.Justification() { Val = DocumentFormat.OpenXml.Wordprocessing.JustificationValues.Center }
+                        );
+                        paragraph.Append(paragraphProperties);
+
+                        paragraph.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(cellData)));
+
+                        cell.Append(paragraph);
+                        cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(
+                            new DocumentFormat.OpenXml.Wordprocessing.TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center }
+                        );
+
+                        row.Append(cell);
+                    }
+                    table.Append(row);
+                }
+
+                // Añade la tabla al documento
+                body.Append(table);
+
+                document.MainDocumentPart.Document.Save();
+            }
+
+            Console.WriteLine($"Se agregó una tabla al documento.");
+        }
 
     }
 }
