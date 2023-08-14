@@ -574,5 +574,85 @@ namespace funcionalidades_documento.funciones_parrafo
                 }
             }
         }
+
+        public static void AgregarListado(string ruta, List<string> items, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion)
+        {
+            if (items == null || items.Count == 0)
+            {
+                throw new ArgumentNullException(nameof(items), "La lista de items no puede ser nula o vacía.");
+            }
+
+            tamanoFuente *= 2;
+
+            ValidarRutaArchivo(ruta);
+
+            using (var document = WordprocessingDocument.Open(ruta, true))
+            {
+                if (document == null)
+                {
+                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
+                }
+
+                var body = document.MainDocumentPart.Document.Body;
+
+                var runProperties = new RunProperties(new FontSize { Val = tamanoFuente.ToString() });
+
+                // Aplicar el estilo correspondiente
+                switch (estilo)
+                {
+                    case EstiloParrafo.Normal:
+                        break;
+                    case EstiloParrafo.Negrita:
+                        runProperties.Append(new Bold());
+                        break;
+                    case EstiloParrafo.Italico:
+                        runProperties.Append(new Italic());
+                        break;
+                    case EstiloParrafo.Subrayado:
+                        runProperties.Append(new Underline { Val = UnderlineValues.Single });
+                        break;
+                    default:
+                        break;
+                }
+
+                // Configuración para viñetas (usa el estilo predefinido de viñetas del documento base)
+                string bulletStyleId = "BulletList"; // Asume que tienes un estilo con este nombre en tu documento base. Ajusta según corresponda.
+
+                // Aplicar la alineación correspondiente
+                Justification justification;
+                switch (alineacion)
+                {
+                    case AlineacionTexto.Izquierda:
+                        justification = new Justification() { Val = JustificationValues.Left };
+                        break;
+                    case AlineacionTexto.Derecha:
+                        justification = new Justification() { Val = JustificationValues.Right };
+                        break;
+                    case AlineacionTexto.Centro:
+                        justification = new Justification() { Val = JustificationValues.Center };
+                        break;
+                    case AlineacionTexto.Justificado:
+                        justification = new Justification() { Val = JustificationValues.Both };
+                        break;
+                    default:
+                        justification = new Justification() { Val = JustificationValues.Left };
+                        break;
+                }
+
+                // Crear y agregar los items como una lista con viñetas al documento
+                foreach (var item in items)
+                {
+                    var run = new Run(runProperties.CloneNode(true), new Text(item));
+                    var paragraphProperties = new ParagraphProperties(new ParagraphStyleId() { Val = bulletStyleId }, justification);
+                    var paragraph = new Paragraph(paragraphProperties, run);
+                    body.AppendChild(paragraph);
+                }
+            }
+
+            Console.WriteLine("Agregando listado con viñetas al documento.");
+        }
+
+
+
     }
 }
