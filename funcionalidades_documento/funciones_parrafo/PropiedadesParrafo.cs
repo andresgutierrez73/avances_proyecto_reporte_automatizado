@@ -575,84 +575,68 @@ namespace funcionalidades_documento.funciones_parrafo
             }
         }
 
-        public static void AgregarListado(string ruta, List<string> items, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion)
+        public static void AgregarListado(string ruta, List<string> items, int tamanoFuente, EstiloParrafo estilo)
         {
             if (items == null || items.Count == 0)
             {
                 throw new ArgumentNullException(nameof(items), "La lista de items no puede ser nula o vacía.");
             }
 
-            tamanoFuente *= 2;
+            // Inicia una nueva aplicación de Word y abre el documento.
+            Word.Application wordApp = new Word.Application();
+            Word.Document document = wordApp.Documents.Open(ruta);
 
-            ValidarRutaArchivo(ruta);
-
-            using (var document = WordprocessingDocument.Open(ruta, true))
+            try
             {
-                if (document == null)
-                {
-                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
-                }
+                // Desplazarse al final del documento.
+                wordApp.Selection.EndKey(Word.WdUnits.wdStory);
 
-                var body = document.MainDocumentPart.Document.Body;
-
-                var runProperties = new RunProperties(new FontSize { Val = tamanoFuente.ToString() });
-
-                // Aplicar el estilo correspondiente
+                // Establecer estilo.
                 switch (estilo)
                 {
-                    case EstiloParrafo.Normal:
-                        break;
                     case EstiloParrafo.Negrita:
-                        runProperties.Append(new Bold());
+                        wordApp.Selection.Font.Bold = 1;
                         break;
                     case EstiloParrafo.Italico:
-                        runProperties.Append(new Italic());
+                        wordApp.Selection.Font.Italic = 1;
                         break;
                     case EstiloParrafo.Subrayado:
-                        runProperties.Append(new Underline { Val = UnderlineValues.Single });
+                        wordApp.Selection.Font.Underline = Word.WdUnderline.wdUnderlineSingle;
                         break;
                     default:
                         break;
                 }
 
-                // Configuración para viñetas (usa el estilo predefinido de viñetas del documento base)
-                string bulletStyleId = "BulletList"; // Asume que tienes un estilo con este nombre en tu documento base. Ajusta según corresponda.
+                // Establecer tamaño de fuente.
+                wordApp.Selection.Font.Size = tamanoFuente;
 
-                // Aplicar la alineación correspondiente
-                Justification justification;
-                switch (alineacion)
+                // Crear una lista con viñetas.
+                wordApp.Selection.Range.ListFormat.ApplyBulletDefault();
+
+                // Agregar los elementos de la lista.
+                foreach (string item in items)
                 {
-                    case AlineacionTexto.Izquierda:
-                        justification = new Justification() { Val = JustificationValues.Left };
-                        break;
-                    case AlineacionTexto.Derecha:
-                        justification = new Justification() { Val = JustificationValues.Right };
-                        break;
-                    case AlineacionTexto.Centro:
-                        justification = new Justification() { Val = JustificationValues.Center };
-                        break;
-                    case AlineacionTexto.Justificado:
-                        justification = new Justification() { Val = JustificationValues.Both };
-                        break;
-                    default:
-                        justification = new Justification() { Val = JustificationValues.Left };
-                        break;
+                    wordApp.Selection.TypeText(item);
+                    wordApp.Selection.TypeParagraph();
                 }
 
-                // Crear y agregar los items como una lista con viñetas al documento
-                foreach (var item in items)
+                // Guardar y cerrar el documento.
+                document.Save();
+                document.Close();
+            }
+            finally
+            {
+                // Asegurarse de liberar los recursos y cerrar Word.
+                if (document != null) Marshal.ReleaseComObject(document);
+                if (wordApp != null)
                 {
-                    var run = new Run(runProperties.CloneNode(true), new Text(item));
-                    var paragraphProperties = new ParagraphProperties(new ParagraphStyleId() { Val = bulletStyleId }, justification);
-                    var paragraph = new Paragraph(paragraphProperties, run);
-                    body.AppendChild(paragraph);
+                    wordApp.Quit();
+                    Marshal.ReleaseComObject(wordApp);
                 }
             }
 
             Console.WriteLine("Agregando listado con viñetas al documento.");
         }
-
-
 
     }
 }

@@ -116,11 +116,7 @@ namespace funcionalidades_documento.funciones_tablas
                 throw new ArgumentNullException(nameof(datos), "Los datos no pueden ser nulos o vacíos.");
             }
 
-            int columnCount = datos[0].Count;
-            if (!datos.All(row => row.Count == columnCount))
-            {
-                throw new ArgumentException("Todas las listas internas deben tener la misma longitud.");
-            }
+            int maxColumnCount = datos.Max(row => row.Count);
 
             ValidarRutaArchivo(ruta);
 
@@ -158,26 +154,52 @@ namespace funcionalidades_documento.funciones_tablas
                 foreach (var rowData in datos)
                 {
                     DocumentFormat.OpenXml.Wordprocessing.TableRow row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
-                    foreach (var cellData in rowData)
+
+                    // Si hay solo un elemento en la fila, hacer que ocupe todas las columnas
+                    if (rowData.Count == 1)
                     {
                         DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
+                        cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(
+                            new DocumentFormat.OpenXml.Wordprocessing.TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center },
+                            new DocumentFormat.OpenXml.Wordprocessing.GridSpan() { Val = maxColumnCount }
+                        );
 
-                        // Alineación horizontal y vertical al centro
                         DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
                         DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties paragraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(
                             new DocumentFormat.OpenXml.Wordprocessing.Justification() { Val = DocumentFormat.OpenXml.Wordprocessing.JustificationValues.Center }
                         );
                         paragraph.Append(paragraphProperties);
 
-                        paragraph.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(cellData)));
+                        paragraph.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(rowData[0])));
 
                         cell.Append(paragraph);
-                        cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(
-                            new DocumentFormat.OpenXml.Wordprocessing.TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center }
-                        );
-
                         row.Append(cell);
                     }
+                    else
+                    {
+                        for (int i = 0; i < maxColumnCount; i++)
+                        {
+                            DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
+
+                            string cellData = i < rowData.Count ? rowData[i] : string.Empty;
+
+                            DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
+                            DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties paragraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(
+                                new DocumentFormat.OpenXml.Wordprocessing.Justification() { Val = DocumentFormat.OpenXml.Wordprocessing.JustificationValues.Center }
+                            );
+                            paragraph.Append(paragraphProperties);
+
+                            paragraph.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(cellData)));
+
+                            cell.Append(paragraph);
+                            cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(
+                                new DocumentFormat.OpenXml.Wordprocessing.TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center }
+                            );
+
+                            row.Append(cell);
+                        }
+                    }
+
                     table.Append(row);
                 }
 

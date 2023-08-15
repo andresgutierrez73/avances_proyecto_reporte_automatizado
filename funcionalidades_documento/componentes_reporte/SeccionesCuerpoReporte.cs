@@ -7,6 +7,7 @@ using funcionalidades_documento.crear_documento;
 using funcionalidades_documento.funciones_parrafo;
 using funcionalidades_documento.funciones_tablas;
 using funcionalidades_documento.funciones_imagenes;
+using DocumentFormat.OpenXml.Office2016.Drawing.Command;
 
 namespace funcionalidades_documento.componentes_reporte
 {
@@ -411,11 +412,127 @@ namespace funcionalidades_documento.componentes_reporte
                     "AC: Carga de accionamiento que aplica solo para interruptores.",
                 };
 
+                //Definimos las listas que contienen los datos que van en las tablas
+
+                //Definimos una variable contador para la numeracion
+                int con = 1;
+
+                List<List<string>> datos1 = new List<List<string>> {
+                    new List<string> { "combinaciones de carga".ToUpper() },
+                    new List<string> { "Diseño Estructural", $"{con++}) 1,2 PP + 1,3 CT+ 1,0 CMM " },
+                    new List<string> { "Diseño Estructural", $"{con++}) 1,1 PP + 1,1 CT ± 1,0 VD(X,Y) + 1,0 CTVDL" },
+                    new List<string> { "Diseño Estructural", $"{con++}) 1,1 PP + 1,1 CT ± 1,0 E(X,Y) ± 0,3 E(Y,X) + 1,0 E(Z)" },
+                    new List<string> { "Diseño Estructural", $"{con++}) 0,9 PP + 1,1 CT ± 1,0 E(X,Y) ± 0,3 E(Y,X) - 1,0 E(Z)" },
+                    new List<string> { "Diseño Estructural", $"{con++}) 1,1 PP + 1,1 CT + 1,0 CC + 1,0 AC" },
+                };
+
+                con = 1;
+                List<List<string>> datos2 = new List<List<string>> {
+                    new List<string> { "combinaciones de carga".ToUpper() },
+                    new List<string> { "Diseño Estructural", $"{con++}) 1,0 PP + 1,0 CT + 1,0 CMM " },
+                    new List<string> { "Diseño Estructural", $"{con++}) 1,0 PP + 1,0 CT ± 1,0 VS(X,Y) + 1,0 CTVSL" },
+                    new List<string> { "Diseño Estructural", $"{con++}) 1,0 PP + 1,0 CT ± 0,7 E(X,Y) ± 0,21 E(Y,X) + 0,7 E(Z) " },
+                    new List<string> { "Diseño Estructural", $"{con++}) 0,6 PP + 1,0 CT ± 0,7 E(X,Y) ± 0,21 E(Y,X) - 0,7 E(Z) " },
+                    new List<string> { "Diseño Estructural", $"{con++}) 1,0 PP + 1,0 CT + 1,0 CC + 1,0 AC " },
+                };
+
+                con = 1;
+                List<List<string>> datos3 = new List<List<string>> {
+                    new List<string> { "Condición", "Combinación" },
+                    new List<string> { "Viento máximo esperado", $"{con++}) 1.0PP + 0.78 V + 1.0 CT " },
+                    new List<string> { "Accionamiento de equipos", $"{con++}) 1.0PP + AC + 1.0 CT " },
+                };
+
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
-                PropiedadesParrafo.AgregarListado(ruta, datos, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos3);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarParrafo(ruta, "Donde,", 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                PropiedadesParrafo.AgregarListado(ruta, datos, 12, FuncionesCreacion.EstiloParrafo.Normal);
+                PropiedadesParrafo.AgregarParrafo(ruta, parrafo3, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+            }
+            catch (Exception ex)
+            {
+                // Mostrar el mensaje de error en caso de que se de alguna excepcion
+                Console.WriteLine("Error al crear el documento de word" + ex.Message);
+            }
+        }
+
+        public static void NomenclaturaReporte(string ruta)
+        {
+            // Controlamos las excepciones
+            try
+            {
+                // Definicion de los titulos y parrafos
+                string titulo = "Nomenclatura del reporte";
+                string parrafo1 = "A continuación, se indica la nomenclatura del reporte del diseño de ángulos del soporte crítico que será presentado posteriormente.";
+
+                // Buscamos la ruta de la imágen
+                string rutaSalidaImagen = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\temp_imagenes\\nomenclaturaReporte.jpeg";
+
+                // Definimos las lista con los valores que van a ir en la tabla
+                List<List<string>> datos1 = new List<List<string>> {
+                    new List<string> { "nomenclatura del reporte".ToUpper() },
+                    new List<string> { "L:", $"Longitud no arriostrada del elemento" },
+                    new List<string> { "Rx,y:", $"Radio de giro del elemento respecto a los ejes geométricos X y Y" },
+                    new List<string> { "Ru:", $"Radio de giro del elemento respecto al eje principal menor U" },
+                    new List<string> { "L/R:", $"Relación de esbeltez" },
+                    new List<string> { "kL/R:", $"Longitud efectiva" },
+                    new List<string> { "Curva:", $"Ecuación empleada para la estimación de la longitud efectiva" },
+                    new List<string> { "(L/R)LIM:", $"Máxima relación de esbeltez" },
+                    new List<string> { "Cc:", $"Relación de esbeltez critica" },
+                    new List<string> { "Fa:", $"Esfuerzo de compresión" },
+                    new List<string> { "Comb:", $"Combinación de carga empleada en el diseño" },
+                    new List<string> { "P", $"Fuerza axial de tracción o compresión*" },
+                    new List<string> { "Puc:", $"Fuerza axial de compresión" },
+                    new List<string> { "Put:", $"Fuerza axial de tracción" },
+                    new List<string> { "V2:", $"Fuerza cortante en el plano 1-2" },
+                    new List<string> { "V3:", $"Fuerza cortante en el plano 1-3" },
+                    new List<string> { "M2:", $"Momento flector en el plano 1-3 (alrededor del eje 2)" },
+                    new List<string> { "M3:", $"Momento flector en el plano 1-2 (alrededor del eje 3)" },
+                    new List<string> { "Mr:", $"Momento actuante resultante, debido a M2 y M3" },
+                    new List<string> { "θ°:", $"Angulo del momento resultante con respecto a la horizontal" },
+                    new List<string> { "Uso:", $"Relación de uso total del elemento (interacción de todas las solicitaciones)" },
+                    new List<string> { "Ecu:", $"Ecuación empleada para estimar el uso" },
+                    new List<string> { "Puc/Pac:", $"Relación de uso del elemento en compresión" },
+                    new List<string> { "Put/Pat-v:", $"Relación de uso del elemento en tracción" },
+                    new List<string> { "Mr/Ma:", $"Relación de uso del elemento en flexión" },
+                    new List<string> { "Pac:", $"Capacidad a compresión del elemento" },
+                    new List<string> { "Pat-g:", $"Capacidad a tracción en el área bruta del elemento" },
+                    new List<string> { "Pat-v:", $"Capacidad a tracción en el área neta del elemento o por bloque de cortante" },
+                    new List<string> { "Pat:", $"Capacidad a tracción del elemento" },
+                    new List<string> { "Ma:", $"Capacidad a flexión del elemento" },
+                    new List<string> { "Pe:", $"Carga critica de pandeo de Euler" },
+                    new List<string> { "ØPyc:", $"Resistencia axial del elemento en el área bruta" },
+                    new List<string> { "Myt:", $"Momento que produce esfuerzos de tracción en la fibra extrema" },
+                    new List<string> { "Myc:", $"Momento que produce compresión en la fibra extrema" },
+                    new List<string> { "Me:", $"Momento crítico elástico" },
+                    new List<string> { "Me.Ecu:", $"Ecuación empleada para el cálculo de Me," },
+                    new List<string> { "Mb:", $"Momento que produce pandeo lateral" },
+                    new List<string> { "Mb.Ecu:", $"Ecuación empleada para el cálculo de Mb," },
+                    new List<string> { "K:", $"Factor que depende de la condición de apoyo del elemento" },
+                    new List<string> { "Cm:", $"Factor que depende de la distribución de momento en la sección" },
+                    new List<string> { "Ø:", $"Diámetro del perno en pulgadas" },
+                    new List<string> { "emin:", $"Distancia mínima al borde del elemento cortado" },
+                    new List<string> { "fmin:", $"Distancia mínima al borde del elemento" },
+                    new List<string> { "smin:", $"Distancia mínima entre centros de perforaciones" },
+                };
+
+                // Llamado a los métodos para editar el documento con la información
+                PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
+                PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaSalidaImagen, 11, 5, FuncionesCreacion.AlineacionImagen.Centro);
+                
 
             }
             catch (Exception ex)
