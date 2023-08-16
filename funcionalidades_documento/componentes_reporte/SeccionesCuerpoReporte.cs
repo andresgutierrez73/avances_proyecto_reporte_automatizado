@@ -106,7 +106,7 @@ namespace funcionalidades_documento.componentes_reporte
 
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos, true);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
 
             }
@@ -159,10 +159,10 @@ namespace funcionalidades_documento.componentes_reporte
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo3, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo4, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo5, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, true);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo6, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2, true);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
 
             }
@@ -202,7 +202,7 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, true);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo3, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
@@ -446,11 +446,11 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, true);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2, true);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos3);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos3, true);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarParrafo(ruta, "Donde,", 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
@@ -529,7 +529,7 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, true);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaSalidaImagen, 11, 5, FuncionesCreacion.AlineacionImagen.Centro);
                 

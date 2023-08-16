@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Word = Microsoft.Office.Interop.Word;
 
 namespace funcionalidades_documento.funciones_tablas
 {
@@ -31,7 +32,6 @@ namespace funcionalidades_documento.funciones_tablas
             }
         }
 
-
         public static void AgregarTablaDatosGrandes(string ruta, List<List<string>> listaDatos, List<string> listaColumnas)
         {
             ValidarRutaArchivo(ruta);
@@ -53,12 +53,12 @@ namespace funcionalidades_documento.funciones_tablas
 
                 // Define el borde de la tabla
                 DocumentFormat.OpenXml.Wordprocessing.TableBorders tblBorders = new DocumentFormat.OpenXml.Wordprocessing.TableBorders(
-                    new DocumentFormat.OpenXml.Wordprocessing.TopBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 1 },
-                    new DocumentFormat.OpenXml.Wordprocessing.BottomBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 1 },
-                    new DocumentFormat.OpenXml.Wordprocessing.LeftBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 1 },
-                    new DocumentFormat.OpenXml.Wordprocessing.RightBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 1 },
-                    new DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 1 },
-                    new DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 1 }
+                    new DocumentFormat.OpenXml.Wordprocessing.TopBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 },
+                    new DocumentFormat.OpenXml.Wordprocessing.BottomBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 },
+                    new DocumentFormat.OpenXml.Wordprocessing.LeftBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 },
+                    new DocumentFormat.OpenXml.Wordprocessing.RightBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 },
+                    new DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 },
+                    new DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 }
                 );
 
                 DocumentFormat.OpenXml.Wordprocessing.TableProperties tblProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties(tableWidth, tblBorders);
@@ -117,7 +117,6 @@ namespace funcionalidades_documento.funciones_tablas
             }
 
             int maxColumnCount = datos.Max(row => row.Count);
-
             ValidarRutaArchivo(ruta);
 
             using (var document = WordprocessingDocument.Open(ruta, true))
@@ -154,11 +153,12 @@ namespace funcionalidades_documento.funciones_tablas
                 foreach (var rowData in datos)
                 {
                     DocumentFormat.OpenXml.Wordprocessing.TableRow row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+                    int currentColumnCount = rowData.Count;
 
-                    // Si hay solo un elemento en la fila, hacer que ocupe todas las columnas
-                    if (rowData.Count == 1)
+                    if (currentColumnCount < maxColumnCount)
                     {
                         DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
+
                         cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(
                             new DocumentFormat.OpenXml.Wordprocessing.TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center },
                             new DocumentFormat.OpenXml.Wordprocessing.GridSpan() { Val = maxColumnCount }
@@ -170,18 +170,16 @@ namespace funcionalidades_documento.funciones_tablas
                         );
                         paragraph.Append(paragraphProperties);
 
-                        paragraph.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(rowData[0])));
+                        paragraph.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(string.Join(" ", rowData))));
 
                         cell.Append(paragraph);
                         row.Append(cell);
                     }
                     else
                     {
-                        for (int i = 0; i < maxColumnCount; i++)
+                        foreach (var cellData in rowData)
                         {
                             DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
-
-                            string cellData = i < rowData.Count ? rowData[i] : string.Empty;
 
                             DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
                             DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties paragraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(
@@ -211,6 +209,118 @@ namespace funcionalidades_documento.funciones_tablas
 
             Console.WriteLine($"Se agregó una tabla al documento.");
         }
+
+        public static void AgregarTablaDesdeLista(string ruta, List<List<string>> datos, bool esEncabezado)
+        {
+            if (datos == null || !datos.Any())
+            {
+                throw new ArgumentNullException(nameof(datos), "Los datos no pueden ser nulos o vacíos.");
+            }
+
+            int maxColumnCount = datos.Max(row => row.Count);
+            ValidarRutaArchivo(ruta);
+
+            using (var document = WordprocessingDocument.Open(ruta, true))
+            {
+                if (document == null)
+                {
+                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
+                }
+
+                var body = document.MainDocumentPart.Document.Body;
+
+                // Crea la tabla
+                DocumentFormat.OpenXml.Wordprocessing.Table table = new DocumentFormat.OpenXml.Wordprocessing.Table();
+
+                // Define el ancho de la tabla al 100% del ancho del documento
+                TableWidth tableWidth = new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct };
+
+                // Define los bordes de la tabla
+                DocumentFormat.OpenXml.Wordprocessing.TableBorders tblBorders = new DocumentFormat.OpenXml.Wordprocessing.TableBorders(
+                    new DocumentFormat.OpenXml.Wordprocessing.TopBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 0 },
+                    new DocumentFormat.OpenXml.Wordprocessing.BottomBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 0 },
+                    new DocumentFormat.OpenXml.Wordprocessing.LeftBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.RightBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 0 },
+                    new DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 0 },
+                    new DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 0 }
+                );
+
+                DocumentFormat.OpenXml.Wordprocessing.TableProperties tblProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
+                tblProperties.Append(tableWidth);
+                tblProperties.Append(tblBorders);
+                table.Append(tblProperties);
+
+                int rowIndex = 0;
+                foreach (var rowData in datos)
+                {
+                    DocumentFormat.OpenXml.Wordprocessing.TableRow row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+                    bool applyHeaderStyle = esEncabezado && rowIndex == 0;
+
+                    if (rowData.Count < maxColumnCount)
+                    {
+                        DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
+
+                        cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(
+                            new DocumentFormat.OpenXml.Wordprocessing.GridSpan() { Val = maxColumnCount }
+                        );
+
+                        if (applyHeaderStyle)
+                        {
+                            DocumentFormat.OpenXml.Wordprocessing.Shading shading = new DocumentFormat.OpenXml.Wordprocessing.Shading()
+                            {
+                                Val = DocumentFormat.OpenXml.Wordprocessing.ShadingPatternValues.Clear,
+                                Fill = "D3D3D3"
+                            };
+                            cell.TableCellProperties.Append(shading);
+                        }
+
+                        DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(string.Join(" ", rowData))));
+                        cell.Append(paragraph);
+                        row.Append(cell);
+                    }
+                    else
+                    {
+                        foreach (var cellData in rowData)
+                        {
+                            DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
+                            DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
+                            DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties paragraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(
+                                new DocumentFormat.OpenXml.Wordprocessing.Justification() { Val = DocumentFormat.OpenXml.Wordprocessing.JustificationValues.Center }
+                            );
+                            paragraph.Append(paragraphProperties);
+
+                            if (applyHeaderStyle)
+                            {
+                                DocumentFormat.OpenXml.Wordprocessing.RunProperties runProps = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+                                runProps.Bold = new DocumentFormat.OpenXml.Wordprocessing.Bold();
+                                paragraphProperties.Append(runProps);
+
+                                DocumentFormat.OpenXml.Wordprocessing.Shading shading = new DocumentFormat.OpenXml.Wordprocessing.Shading()
+                                {
+                                    Val = DocumentFormat.OpenXml.Wordprocessing.ShadingPatternValues.Clear,
+                                    Fill = "D3D3D3"
+                                };
+                                cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties();
+                                cell.TableCellProperties.Append(shading);
+                            }
+
+                            paragraph.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(cellData)));
+                            cell.Append(paragraph);
+                            row.Append(cell);
+                        }
+                    }
+
+                    table.Append(row);
+                    rowIndex++;
+                }
+
+                body.Append(table);
+                document.MainDocumentPart.Document.Save();
+
+                Console.WriteLine($"Se agregó una tabla al documento.");
+            }
+        }
+
 
     }
 }

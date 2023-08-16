@@ -575,6 +575,15 @@ namespace funcionalidades_documento.funciones_parrafo
             }
         }
 
+        /// <summary>
+        /// Este método usa la libreria de microsoft office interop para hacer las listas con viñetas, de este modo la numeración
+        /// no se de estropea porque openxml solo deja hacer una numeracion
+        /// </summary>
+        /// <param name="ruta">Aquí va a el directorio donde esta el documento de word</param>
+        /// <param name="items">Aquí se recibe una lista con los elementos de las listas</param>
+        /// <param name="tamanoFuente">Aquí se inserta un valor numerico con el tamaño de la fuente</param>
+        /// <param name="estilo">Aquí se pasa un enum con el estilo del texto</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public static void AgregarListado(string ruta, List<string> items, int tamanoFuente, EstiloParrafo estilo)
         {
             if (items == null || items.Count == 0)
