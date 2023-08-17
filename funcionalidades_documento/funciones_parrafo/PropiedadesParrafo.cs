@@ -32,6 +32,7 @@ namespace funcionalidades_documento.funciones_parrafo
                 throw new ArgumentException("La ruta debe tener una extensión .docx");
             }
         }
+
         /// <summary>
         /// Método para agregar un párrafo con estilo y alineación indicados al documento
         /// </summary>
@@ -41,10 +42,8 @@ namespace funcionalidades_documento.funciones_parrafo
         /// <param name="estilo">Aquí se pasa un enum con los estilos de letra predefinidos del word</param>
         /// <param name="alineacion">Aquí se pasa un enum con los tipos de alineación que hay en word</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void AgregarParrafo(string ruta, string texto, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion)
+        public static void AgregarParrafo(string ruta, string texto, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion)    
         {
-            // Por defecto, al librería de OpenXML divide a la mitad el valor que se ingresa
-            // como tamaño de la fuente, por ello en el método debe multiplicarse este valor por 2
             tamanoFuente *= 2;
 
             ValidarRutaArchivo(ruta);
@@ -60,11 +59,12 @@ namespace funcionalidades_documento.funciones_parrafo
 
                 var runProperties = new RunProperties(new FontSize { Val = tamanoFuente.ToString() });
 
-                // Aplicar el estilo correspondiente
+                // Establecer la fuente a Arial
+                runProperties.RunFonts = new RunFonts { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" };
+
                 switch (estilo)
                 {
                     case EstiloParrafo.Normal:
-                        // No se aplica ningún estilo adicional
                         break;
                     case EstiloParrafo.Negrita:
                         runProperties.Append(new Bold());
@@ -76,31 +76,32 @@ namespace funcionalidades_documento.funciones_parrafo
                         runProperties.Append(new Underline { Val = UnderlineValues.Single });
                         break;
                     default:
-                        // Si se proporciona un estilo no reconocido, se asume el estilo normal
                         break;
                 }
 
                 var run = new Run(runProperties, new Text(texto));
                 var paragraph = new Paragraph(run);
 
-                // Aplicar la alineación correspondiente
+                // Configuración para evitar saltos de línea entre párrafos consecutivos
+                var spacing = new SpacingBetweenLines() { After = "0" };
+                paragraph.ParagraphProperties = new ParagraphProperties(spacing);
+
                 switch (alineacion)
                 {
                     case AlineacionTexto.Izquierda:
-                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Left });
+                        paragraph.ParagraphProperties.Append(new Justification { Val = JustificationValues.Left });
                         break;
                     case AlineacionTexto.Derecha:
-                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Right });
+                        paragraph.ParagraphProperties.Append(new Justification { Val = JustificationValues.Right });
                         break;
                     case AlineacionTexto.Centro:
-                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Center });
+                        paragraph.ParagraphProperties.Append(new Justification { Val = JustificationValues.Center });
                         break;
                     case AlineacionTexto.Justificado:
-                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Both });
+                        paragraph.ParagraphProperties.Append(new Justification { Val = JustificationValues.Both });
                         break;
                     default:
-                        // Si se proporciona una alineación no reconocida, se asume alineación izquierda
-                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Left });
+                        paragraph.ParagraphProperties.Append(new Justification { Val = JustificationValues.Left });
                         break;
                 }
 
@@ -219,10 +220,11 @@ namespace funcionalidades_documento.funciones_parrafo
                     StyleRunProperties = new StyleRunProperties()
                     {
                         Bold = estilo == EstiloParrafo.Negrita ? new Bold() : null,
-                        Italic = estilo == EstiloParrafo.Italico ? new Italic() : null,
+                        Italic = new Italic(),
                         Underline = estilo == EstiloParrafo.Subrayado ? new Underline() : null,
                         FontSize = new FontSize() { Val = tamanoFuente.ToString() },
-                        Color = new Color() { Val = "000000" } // Establecer el color de fuente a negro
+                        Color = new Color() { Val = "000000" }, // Establecer el color de fuente a negro
+                        RunFonts = new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" }
                     },
                     StyleParagraphProperties = new StyleParagraphProperties()
                     {
@@ -364,6 +366,7 @@ namespace funcionalidades_documento.funciones_parrafo
                 Run tituloRun = new Run(new Text(tituloTabla));
                 RunProperties tituloRunProperties = new RunProperties();
                 tituloRunProperties.Append(new Bold());
+                tituloRunProperties.RunFonts = new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" };  // Fuente Arial
                 tituloRun.PrependChild<RunProperties>(tituloRunProperties);
 
                 ParagraphProperties tituloParaProperties = new ParagraphProperties();
@@ -376,7 +379,9 @@ namespace funcionalidades_documento.funciones_parrafo
                 Paragraph Contenido = new Paragraph(
                     new ParagraphProperties(
                         new RunProperties(
-                            new NoProof())
+                            new NoProof(),
+                            new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" }  // Fuente Arial
+                            )
                         ),
                     new Run(
                         new FieldChar { FieldCharType = FieldCharValues.Begin, Dirty = true }
@@ -394,7 +399,8 @@ namespace funcionalidades_documento.funciones_parrafo
                     new Run(
                         new RunProperties(
                             new Bold(),
-                            new NoProof()
+                            new NoProof(),
+                            new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" }  // Fuente Arial
                             ),
                          new FieldChar { FieldCharType = FieldCharValues.End }
                         )
@@ -446,7 +452,7 @@ namespace funcionalidades_documento.funciones_parrafo
 
                 var body = document.MainDocumentPart.Document.Body;
 
-                var runProperties = new RunProperties(new FontSize { Val = tamanoFuente.ToString() });
+                var runProperties = new RunProperties(new FontSize { Val = tamanoFuente.ToString() }, new RunFonts { Ascii = "Arial", HighAnsi = "Arial" }); // Establecer la fuente a Arial
 
                 // Aplicar el estilo correspondiente
                 switch (estilo)
@@ -469,25 +475,31 @@ namespace funcionalidades_documento.funciones_parrafo
                 var run = new Run(runProperties, new Text(texto));
                 var paragraph = new Paragraph(run);
 
+                // Evitar salto de línea después del párrafo
+                var spacing = new SpacingBetweenLines() { After = "0" };
+                var paragraphProps = new ParagraphProperties(spacing);
+
                 // Aplicar la alineación correspondiente
                 switch (alineacion)
                 {
                     case AlineacionTexto.Izquierda:
-                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Left });
+                        paragraphProps.Append(new Justification { Val = JustificationValues.Left });
                         break;
                     case AlineacionTexto.Derecha:
-                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Right });
+                        paragraphProps.Append(new Justification { Val = JustificationValues.Right });
                         break;
                     case AlineacionTexto.Centro:
-                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Center });
+                        paragraphProps.Append(new Justification { Val = JustificationValues.Center });
                         break;
                     case AlineacionTexto.Justificado:
-                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Both });
+                        paragraphProps.Append(new Justification { Val = JustificationValues.Both });
                         break;
                     default:
-                        paragraph.ParagraphProperties = new ParagraphProperties(new Justification { Val = JustificationValues.Left });
+                        paragraphProps.Append(new Justification { Val = JustificationValues.Left });
                         break;
                 }
+
+                paragraph.PrependChild(paragraphProps);
 
                 body.AppendChild(paragraph);
                 document.MainDocumentPart.Document.Save();
@@ -556,7 +568,14 @@ namespace funcionalidades_documento.funciones_parrafo
                 // Cambiar el estilo de la bibliografía a IEEE
                 Word.Bibliography bib = doc.Bibliography;
                 bib.BibliographyStyle = "IEEE";
-                bibliographyRange.Fields.Add(bibliographyRange, Word.WdFieldType.wdFieldBibliography);
+                Word.Field bibField = bibliographyRange.Fields.Add(bibliographyRange, Word.WdFieldType.wdFieldBibliography);
+
+                // Define un estilo con fuente Arial y aplícalo a la bibliografía
+                Word.Style bibStyle = doc.Styles.Add("BibliographyArialStyle", Word.WdStyleType.wdStyleTypeParagraph);
+                bibStyle.Font.Name = "Arial";
+
+                Word.Range bibFieldRange = bibField.Code;
+                bibFieldRange.Next().set_Style(bibStyle);
 
                 doc.Save();
             }
@@ -575,84 +594,79 @@ namespace funcionalidades_documento.funciones_parrafo
             }
         }
 
-        public static void AgregarListado(string ruta, List<string> items, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion)
+        /// <summary>
+        /// Este método usa la libreria de microsoft office interop para hacer las listas con viñetas, de este modo la numeración
+        /// no se de estropea porque openxml solo deja hacer una numeracion
+        /// </summary>
+        /// <param name="ruta">Aquí va a el directorio donde esta el documento de word</param>
+        /// <param name="items">Aquí se recibe una lista con los elementos de las listas</param>
+        /// <param name="tamanoFuente">Aquí se inserta un valor numerico con el tamaño de la fuente</param>
+        /// <param name="estilo">Aquí se pasa un enum con el estilo del texto</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static void AgregarListado(string ruta, List<string> items, int tamanoFuente, EstiloParrafo estilo)
         {
             if (items == null || items.Count == 0)
             {
                 throw new ArgumentNullException(nameof(items), "La lista de items no puede ser nula o vacía.");
             }
 
-            tamanoFuente *= 2;
+            // Inicia una nueva aplicación de Word y abre el documento.
+            Word.Application wordApp = new Word.Application();
+            Word.Document document = wordApp.Documents.Open(ruta);
 
-            ValidarRutaArchivo(ruta);
-
-            using (var document = WordprocessingDocument.Open(ruta, true))
+            try
             {
-                if (document == null)
-                {
-                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
-                }
+                // Desplazarse al final del documento.
+                wordApp.Selection.EndKey(Word.WdUnits.wdStory);
 
-                var body = document.MainDocumentPart.Document.Body;
+                // Establecer fuente a Arial.
+                wordApp.Selection.Font.Name = "Arial";
 
-                var runProperties = new RunProperties(new FontSize { Val = tamanoFuente.ToString() });
-
-                // Aplicar el estilo correspondiente
+                // Establecer estilo.
                 switch (estilo)
                 {
-                    case EstiloParrafo.Normal:
-                        break;
                     case EstiloParrafo.Negrita:
-                        runProperties.Append(new Bold());
+                        wordApp.Selection.Font.Bold = 1;
                         break;
                     case EstiloParrafo.Italico:
-                        runProperties.Append(new Italic());
+                        wordApp.Selection.Font.Italic = 1;
                         break;
                     case EstiloParrafo.Subrayado:
-                        runProperties.Append(new Underline { Val = UnderlineValues.Single });
+                        wordApp.Selection.Font.Underline = Word.WdUnderline.wdUnderlineSingle;
                         break;
                     default:
                         break;
                 }
 
-                // Configuración para viñetas (usa el estilo predefinido de viñetas del documento base)
-                string bulletStyleId = "BulletList"; // Asume que tienes un estilo con este nombre en tu documento base. Ajusta según corresponda.
+                // Establecer tamaño de fuente.
+                wordApp.Selection.Font.Size = tamanoFuente;
 
-                // Aplicar la alineación correspondiente
-                Justification justification;
-                switch (alineacion)
+                // Crear una lista con viñetas.
+                wordApp.Selection.Range.ListFormat.ApplyBulletDefault();
+
+                // Agregar los elementos de la lista.
+                foreach (string item in items)
                 {
-                    case AlineacionTexto.Izquierda:
-                        justification = new Justification() { Val = JustificationValues.Left };
-                        break;
-                    case AlineacionTexto.Derecha:
-                        justification = new Justification() { Val = JustificationValues.Right };
-                        break;
-                    case AlineacionTexto.Centro:
-                        justification = new Justification() { Val = JustificationValues.Center };
-                        break;
-                    case AlineacionTexto.Justificado:
-                        justification = new Justification() { Val = JustificationValues.Both };
-                        break;
-                    default:
-                        justification = new Justification() { Val = JustificationValues.Left };
-                        break;
+                    wordApp.Selection.TypeText(item);
+                    wordApp.Selection.TypeParagraph();
                 }
 
-                // Crear y agregar los items como una lista con viñetas al documento
-                foreach (var item in items)
+                // Guardar y cerrar el documento.
+                document.Save();
+                document.Close();
+            }
+            finally
+            {
+                // Asegurarse de liberar los recursos y cerrar Word.
+                if (document != null) Marshal.ReleaseComObject(document);
+                if (wordApp != null)
                 {
-                    var run = new Run(runProperties.CloneNode(true), new Text(item));
-                    var paragraphProperties = new ParagraphProperties(new ParagraphStyleId() { Val = bulletStyleId }, justification);
-                    var paragraph = new Paragraph(paragraphProperties, run);
-                    body.AppendChild(paragraph);
+                    wordApp.Quit();
+                    Marshal.ReleaseComObject(wordApp);
                 }
             }
 
             Console.WriteLine("Agregando listado con viñetas al documento.");
         }
-
-
-
     }
 }

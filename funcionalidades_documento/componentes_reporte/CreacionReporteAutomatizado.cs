@@ -2,11 +2,13 @@
 using funcionalidades_documento.funciones_imagenes;
 using funcionalidades_documento.funciones_parrafo;
 using funcionalidades_documento.funciones_tablas;
+using funcionalidades_documento.edicion_footer_header;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Policy;
 
 namespace funcionalidades_documento.componentes_reporte
 {
@@ -66,6 +68,7 @@ namespace funcionalidades_documento.componentes_reporte
                     new List<string> { "", "", "", "", "", "", ""  },
                     new List<string> { "", "", "", "", "", "", ""  },
                     new List<string> { "PA", "1", "Emisión Inicial", "2022.09.16", "C.CASTAÑO", "C,METRIO", "I.VILLALBA"  },
+                    new List<string> { "", "1", "Emisión Inicial", "2022.09.16", "C.CASTAÑO", "C,METRIO", "I.VILLALBA"  },
                     new List<string> { "Estado/fase", "Rev", "Comentarios/Modificaciones", "Fecha de Act", "Elaboró", "Revisó", "Aprobó"  },
                 };
 
@@ -91,6 +94,15 @@ namespace funcionalidades_documento.componentes_reporte
             // Controlamos las excepciones del programa
             try
             {
+                //Creamos las variables con el texto que va en el encabezado y pie
+                string encabezadoAlto = "CO-RBAN: RENOVACIÓN SUBESTACIÓN BANADÍA 230 kV";
+                string encabezadoBajo = "MEMORIA DE DISEÑO DE ESTRUCTURAS METÁLICAS DE PÓRTICOS";
+                string pie = "Archivo: CO-RBAN-14113-S-01-D1531";
+
+                //Llamado a los métodos para editar el encabezado y pie
+                EditarEncabezadoPie.EditarEncabezado(ruta, encabezadoAlto, encabezadoBajo, 2);
+                EditarEncabezadoPie.EditarPieDePagina(ruta, pie);
+
                 SeccionesCuerpoReporte.Objeto(ruta);
                 SeccionesCuerpoReporte.Alcance(ruta);
                 SeccionesCuerpoReporte.DescripcionPorticos(ruta);
@@ -104,6 +116,7 @@ namespace funcionalidades_documento.componentes_reporte
                 SeccionesCuerpoReporte.CargasSismo(ruta);
                 SeccionesCuerpoReporte.CargasMontajeMantenimiento(ruta);
                 SeccionesCuerpoReporte.CombinacionesCarga(ruta);
+                SeccionesCuerpoReporte.NomenclaturaReporte(ruta);
             }
             catch (Exception ex)
             {
