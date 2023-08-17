@@ -106,7 +106,7 @@ namespace funcionalidades_documento.componentes_reporte
 
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos, true);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos, 1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
 
             }
@@ -159,10 +159,10 @@ namespace funcionalidades_documento.componentes_reporte
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo3, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo4, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo5, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, true);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, 1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo6, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2, true);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2, 1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
 
             }
@@ -189,8 +189,8 @@ namespace funcionalidades_documento.componentes_reporte
 
                 // Definicion de la lista con los datos que van a tener las tablas
                 List<List<string>> datos1 = new List<List<string>> {
-                    new List<string> { "tipo de deflexión".ToUpper(), "estructuras de clase a".ToUpper(), "estructuras de clase a".ToUpper(), "estructuras de clase b".ToUpper(), "estructuras de clase b".ToUpper() },
-                    new List<string> { "tipo de deflexión".ToUpper(), "Elementos horizontales", "Elementos verticales", "Elementos horizontales ", "Elementos verticales" },
+                    new List<string> { "tipo de deflexión".ToUpper(), "estructuras de clase a".ToUpper(), "~", "estructuras de clase b".ToUpper(), "~" },
+                    new List<string> { "|", "Elementos horizontales", "Elementos verticales", "Elementos horizontales ", "Elementos verticales" },
                     new List<string> { "Horizontal", "1/200 ", "1/100 ", "1/100 ", "1/100" },
                     new List<string> { "Vertical", "1/200 ", "", "1/200", "" },
                 };
@@ -202,7 +202,7 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, true);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, 2);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo3, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
@@ -418,7 +418,7 @@ namespace funcionalidades_documento.componentes_reporte
                 int con = 1;
 
                 List<List<string>> datos1 = new List<List<string>> {
-                    new List<string> { "combinaciones de carga".ToUpper() },
+                    new List<string> { "combinaciones de carga".ToUpper(), "~" },
                     new List<string> { "Diseño Estructural", $"{con++}) 1,2 PP + 1,3 CT+ 1,0 CMM " },
                     new List<string> { "Diseño Estructural", $"{con++}) 1,1 PP + 1,1 CT ± 1,0 VD(X,Y) + 1,0 CTVDL" },
                     new List<string> { "Diseño Estructural", $"{con++}) 1,1 PP + 1,1 CT ± 1,0 E(X,Y) ± 0,3 E(Y,X) + 1,0 E(Z)" },
@@ -428,7 +428,7 @@ namespace funcionalidades_documento.componentes_reporte
 
                 con = 1;
                 List<List<string>> datos2 = new List<List<string>> {
-                    new List<string> { "combinaciones de carga".ToUpper() },
+                    new List<string> { "combinaciones de carga".ToUpper(), "~" },
                     new List<string> { "Diseño Estructural", $"{con++}) 1,0 PP + 1,0 CT + 1,0 CMM " },
                     new List<string> { "Diseño Estructural", $"{con++}) 1,0 PP + 1,0 CT ± 1,0 VS(X,Y) + 1,0 CTVSL" },
                     new List<string> { "Diseño Estructural", $"{con++}) 1,0 PP + 1,0 CT ± 0,7 E(X,Y) ± 0,21 E(Y,X) + 0,7 E(Z) " },
@@ -446,11 +446,11 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, true);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, 1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2, true);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2, 1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos3, true);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos3, 1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarParrafo(ruta, "Donde,", 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
@@ -480,7 +480,7 @@ namespace funcionalidades_documento.componentes_reporte
 
                 // Definimos las lista con los valores que van a ir en la tabla
                 List<List<string>> datos1 = new List<List<string>> {
-                    new List<string> { "nomenclatura del reporte".ToUpper() },
+                    new List<string> { "nomenclatura del reporte".ToUpper(), "~" },
                     new List<string> { "L:", $"Longitud no arriostrada del elemento" },
                     new List<string> { "Rx,y:", $"Radio de giro del elemento respecto a los ejes geométricos X y Y" },
                     new List<string> { "Ru:", $"Radio de giro del elemento respecto al eje principal menor U" },
@@ -529,11 +529,9 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, true);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, 1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaSalidaImagen, 11, 5, FuncionesCreacion.AlineacionImagen.Centro);
-                
-
             }
             catch (Exception ex)
             {

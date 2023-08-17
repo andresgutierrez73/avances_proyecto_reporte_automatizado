@@ -68,6 +68,7 @@ namespace funcionalidades_documento.componentes_reporte
                     new List<string> { "", "", "", "", "", "", ""  },
                     new List<string> { "", "", "", "", "", "", ""  },
                     new List<string> { "PA", "1", "Emisión Inicial", "2022.09.16", "C.CASTAÑO", "C,METRIO", "I.VILLALBA"  },
+                    new List<string> { "", "1", "Emisión Inicial", "2022.09.16", "C.CASTAÑO", "C,METRIO", "I.VILLALBA"  },
                     new List<string> { "Estado/fase", "Rev", "Comentarios/Modificaciones", "Fecha de Act", "Elaboró", "Revisó", "Aprobó"  },
                 };
 

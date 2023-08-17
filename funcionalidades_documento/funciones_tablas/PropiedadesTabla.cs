@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TableCellProperties = DocumentFormat.OpenXml.Drawing.TableCellProperties;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace funcionalidades_documento.funciones_tablas
@@ -150,67 +151,87 @@ namespace funcionalidades_documento.funciones_tablas
                 table.Append(tblProperties);
 
                 // Añadir las filas desde datos
-                foreach (var rowData in datos)
+                for (int rowIndex = 0; rowIndex < datos.Count; rowIndex++)
                 {
                     DocumentFormat.OpenXml.Wordprocessing.TableRow row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
-                    int currentColumnCount = rowData.Count;
+                    int currentColumnCount = datos[rowIndex].Count;
 
-                    if (currentColumnCount < maxColumnCount)
+                    if (rowIndex == 0)
                     {
+                        // Define la primera fila como encabezado de tabla
+                        row.TableRowProperties = new TableRowProperties(
+                            new TableHeader() { Val = OnOffOnlyValues.On }
+                        );
+                    }
+
+                    for (int colIndex = 0; colIndex < currentColumnCount; colIndex++)
+                    {
+                        var cellText = datos[rowIndex][colIndex];
+
+                        // Crea la celda
                         DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
 
-                        cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(
-                            new DocumentFormat.OpenXml.Wordprocessing.TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center },
-                            new DocumentFormat.OpenXml.Wordprocessing.GridSpan() { Val = maxColumnCount }
-                        );
+                        // Define las propiedades de la celda
+                        DocumentFormat.OpenXml.Wordprocessing.TableCellProperties cellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties();
+                        cellProperties.Append(new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center });
 
+                        // Verifica si la celda debe ser combinada horizontalmente
+                        if (cellText.Contains("~"))
+                        {
+                            cellText = cellText.Replace("~", "");
+
+                            // Define la celda como una celda de continuación de combinación horizontal
+                            cellProperties.Append(new HorizontalMerge() { Val = MergedCellValues.Continue });
+                        }
+                        else
+                        {
+                            // Define la celda como una celda de inicio de combinación horizontal
+                            cellProperties.Append(new HorizontalMerge() { Val = MergedCellValues.Restart });
+                        }
+
+                        // Verifica si la celda debe ser combinada verticalmente
+                        if (cellText.Contains("|"))
+                        {
+                            cellText = cellText.Replace("|", "");
+
+                            // Define la celda como una celda de continuación de combinación vertical
+                            cellProperties.Append(new VerticalMerge() { Val = MergedCellValues.Continue });
+                        }
+                        else
+                        {
+                            // Define la celda como una celda de inicio de combinación vertical
+                            cellProperties.Append(new VerticalMerge() { Val = MergedCellValues.Restart });
+                        }
+
+                        // Agrega el texto a la celda
                         DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
-                        DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties paragraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(
-                            new DocumentFormat.OpenXml.Wordprocessing.Justification() { Val = DocumentFormat.OpenXml.Wordprocessing.JustificationValues.Center }
-                        );
-                        paragraph.Append(paragraphProperties);
-
-                        paragraph.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(string.Join(" ", rowData))));
-
+                        DocumentFormat.OpenXml.Wordprocessing.Run run = new DocumentFormat.OpenXml.Wordprocessing.Run();
+                        run.Append(new DocumentFormat.OpenXml.Wordprocessing.Text(cellText));
+                        paragraph.Append(run);
                         cell.Append(paragraph);
+
+                        // Agrega las propiedades a la celda
+                        cell.Append(cellProperties);
+
+                        // Agrega la celda a la fila
                         row.Append(cell);
                     }
-                    else
-                    {
-                        foreach (var cellData in rowData)
-                        {
-                            DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
 
-                            DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
-                            DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties paragraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(
-                                new DocumentFormat.OpenXml.Wordprocessing.Justification() { Val = DocumentFormat.OpenXml.Wordprocessing.JustificationValues.Center }
-                            );
-                            paragraph.Append(paragraphProperties);
-
-                            paragraph.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(cellData)));
-
-                            cell.Append(paragraph);
-                            cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(
-                                new DocumentFormat.OpenXml.Wordprocessing.TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center }
-                            );
-
-                            row.Append(cell);
-                        }
-                    }
-
+                    // Agrega la fila a la tabla
                     table.Append(row);
                 }
 
-                // Añade la tabla al documento
+                // Agrega la tabla al documento
                 body.Append(table);
 
+                // Guarda los cambios en el documento
                 document.MainDocumentPart.Document.Save();
             }
 
             Console.WriteLine($"Se agregó una tabla al documento.");
         }
 
-        public static void AgregarTablaDesdeLista(string ruta, List<List<string>> datos, bool esEncabezado)
+        public static void AgregarTablaDesdeLista(string ruta, List<List<string>> datos, int filasConFondo = 0)
         {
             if (datos == null || !datos.Any())
             {
@@ -237,12 +258,12 @@ namespace funcionalidades_documento.funciones_tablas
 
                 // Define los bordes de la tabla
                 DocumentFormat.OpenXml.Wordprocessing.TableBorders tblBorders = new DocumentFormat.OpenXml.Wordprocessing.TableBorders(
-                    new DocumentFormat.OpenXml.Wordprocessing.TopBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 0 },
-                    new DocumentFormat.OpenXml.Wordprocessing.BottomBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 0 },
+                    new DocumentFormat.OpenXml.Wordprocessing.TopBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.BottomBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
                     new DocumentFormat.OpenXml.Wordprocessing.LeftBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
-                    new DocumentFormat.OpenXml.Wordprocessing.RightBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 0 },
-                    new DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 0 },
-                    new DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 0 }
+                    new DocumentFormat.OpenXml.Wordprocessing.RightBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 }
                 );
 
                 DocumentFormat.OpenXml.Wordprocessing.TableProperties tblProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
@@ -250,75 +271,92 @@ namespace funcionalidades_documento.funciones_tablas
                 tblProperties.Append(tblBorders);
                 table.Append(tblProperties);
 
-                int rowIndex = 0;
-                foreach (var rowData in datos)
+                // Añadir las filas desde datos
+                for (int rowIndex = 0; rowIndex < datos.Count; rowIndex++)
                 {
                     DocumentFormat.OpenXml.Wordprocessing.TableRow row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
-                    bool applyHeaderStyle = esEncabezado && rowIndex == 0;
+                    int currentColumnCount = datos[rowIndex].Count;
 
-                    if (rowData.Count < maxColumnCount)
+                    if (rowIndex == 0)
                     {
+                        // Define la primera fila como encabezado de tabla
+                        row.TableRowProperties = new TableRowProperties(
+                            new TableHeader() { Val = OnOffOnlyValues.On }
+                        );
+                    }
+
+                    for (int colIndex = 0; colIndex < currentColumnCount; colIndex++)
+                    {
+                        var cellText = datos[rowIndex][colIndex];
+
+                        // Crea la celda
                         DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
 
-                        cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(
-                            new DocumentFormat.OpenXml.Wordprocessing.GridSpan() { Val = maxColumnCount }
-                        );
+                        // Define las propiedades de la celda
+                        DocumentFormat.OpenXml.Wordprocessing.TableCellProperties cellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties();
+                        cellProperties.Append(new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center });
 
-                        if (applyHeaderStyle)
+                        // Verifica si la celda debe ser combinada horizontalmente
+                        if (cellText.Contains("~"))
                         {
-                            DocumentFormat.OpenXml.Wordprocessing.Shading shading = new DocumentFormat.OpenXml.Wordprocessing.Shading()
-                            {
-                                Val = DocumentFormat.OpenXml.Wordprocessing.ShadingPatternValues.Clear,
-                                Fill = "D3D3D3"
-                            };
-                            cell.TableCellProperties.Append(shading);
+                            cellText = cellText.Replace("~", "");
+
+                            // Define la celda como una celda de continuación de combinación horizontal
+                            cellProperties.Append(new HorizontalMerge() { Val = MergedCellValues.Continue });
+                        }
+                        else
+                        {
+                            // Define la celda como una celda de inicio de combinación horizontal
+                            cellProperties.Append(new HorizontalMerge() { Val = MergedCellValues.Restart });
                         }
 
-                        DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(string.Join(" ", rowData))));
+                        // Verifica si la celda debe ser combinada verticalmente
+                        if (cellText.Contains("|"))
+                        {
+                            cellText = cellText.Replace("|", "");
+
+                            // Define la celda como una celda de continuación de combinación vertical
+                            cellProperties.Append(new VerticalMerge() { Val = MergedCellValues.Continue });
+                        }
+                        else
+                        {
+                            // Define la celda como una celda de inicio de combinación vertical
+                            cellProperties.Append(new VerticalMerge() { Val = MergedCellValues.Restart });
+                        }
+
+                        // Agrega el texto a la celda
+                        DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
+                        DocumentFormat.OpenXml.Wordprocessing.Run run = new DocumentFormat.OpenXml.Wordprocessing.Run();
+                        run.Append(new DocumentFormat.OpenXml.Wordprocessing.Text(cellText));
+                        paragraph.Append(run);
                         cell.Append(paragraph);
+
+                        // Agrega las propiedades a la celda
+                        cell.Append(cellProperties);
+
+                        // Si se especificó un número de filas con fondo, darle fondo gris y poner la letra en negrita y centrada
+                        if (filasConFondo > 0 && rowIndex < filasConFondo)
+                        {
+                            cellProperties.Append(new Shading() { Val = ShadingPatternValues.Clear, Fill = "f0f0f0" });
+                            run.RunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties(new Bold(), new Justification() { Val = JustificationValues.Center });
+                        }
+
+                        // Agrega la celda a la fila
                         row.Append(cell);
                     }
-                    else
-                    {
-                        foreach (var cellData in rowData)
-                        {
-                            DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
-                            DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
-                            DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties paragraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(
-                                new DocumentFormat.OpenXml.Wordprocessing.Justification() { Val = DocumentFormat.OpenXml.Wordprocessing.JustificationValues.Center }
-                            );
-                            paragraph.Append(paragraphProperties);
 
-                            if (applyHeaderStyle)
-                            {
-                                DocumentFormat.OpenXml.Wordprocessing.RunProperties runProps = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
-                                runProps.Bold = new DocumentFormat.OpenXml.Wordprocessing.Bold();
-                                paragraphProperties.Append(runProps);
-
-                                DocumentFormat.OpenXml.Wordprocessing.Shading shading = new DocumentFormat.OpenXml.Wordprocessing.Shading()
-                                {
-                                    Val = DocumentFormat.OpenXml.Wordprocessing.ShadingPatternValues.Clear,
-                                    Fill = "D3D3D3"
-                                };
-                                cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties();
-                                cell.TableCellProperties.Append(shading);
-                            }
-
-                            paragraph.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(cellData)));
-                            cell.Append(paragraph);
-                            row.Append(cell);
-                        }
-                    }
-
+                    // Agrega la fila a la tabla
                     table.Append(row);
-                    rowIndex++;
                 }
 
+                // Agrega la tabla al documento
                 body.Append(table);
-                document.MainDocumentPart.Document.Save();
 
-                Console.WriteLine($"Se agregó una tabla al documento.");
+                // Guarda los cambios en el documento
+                document.MainDocumentPart.Document.Save();
             }
+
+            Console.WriteLine($"Se agregó una tabla al documento.");
         }
 
 
