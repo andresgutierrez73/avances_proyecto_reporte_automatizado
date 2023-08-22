@@ -97,7 +97,9 @@ namespace funcionalidades_documento.crear_documento
         {
             Izquierda,
             Centro,
-            Derecha
+            Derecha,
+            Arriba,
+            Abajo
         }
     }
 }
