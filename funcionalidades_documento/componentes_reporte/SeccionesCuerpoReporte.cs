@@ -48,6 +48,7 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
 
@@ -92,16 +93,16 @@ namespace funcionalidades_documento.componentes_reporte
                 //Definimos la lista con los valores que van a ir en la tabla
                 List<List<string>> datos = new List<List<string>> {
                     new List<string> { "ítem".ToUpper(), "descripción".ToUpper(), "criterio".ToUpper()  },
-                    new List<string> { "elementos", "Perfiles", "ASTM A-572 Gr50 ó ASTM A-36"  },
-                    new List<string> { "elementos", "Platinas", "ASTM A-36"  },
-                    new List<string> { "elementos", "Soldadura", "E60, E70"  },
-                    new List<string> { "elementos", "Tornillos", "ASTM A-394"  },
-                    new List<string> { "elementos", "Pernos de anclaje", "ASTM F1554 Gr55. Resistencia mínima \r\n\r\nfy = 380 MPa y fu =517 MPa "  },
-                    new List<string> { "elementos", "Arandelas", "ASTM F-436"  },
-                    new List<string> { "elementos", "Tuercas", "ASTM A-563"  },
-                    new List<string> { "elementos", "Galvanización", "ASTM A-123, ASTM A-153"  },
-                    new List<string> { "elementos", "Columnas ", "Celosía "  },
-                    new List<string> { "elementos", "Vigas", "Celosía "  },
+                    new List<string> { "elemento", "Perfiles", "ASTM A-572 Gr50 ó ASTM A-36"  },
+                    new List<string> { "|", "Platinas", "ASTM A-36"  },
+                    new List<string> { "|", "Soldadura", "E60, E70"  },
+                    new List<string> { "|", "Tornillos", "ASTM A-394"  },
+                    new List<string> { "|", "Pernos de anclaje", "ASTM F1554 Gr55. Resistencia mínima \r\n\r\nfy = 380 MPa y fu =517 MPa "  },
+                    new List<string> { "|", "Arandelas", "ASTM F-436"  },
+                    new List<string> { "|", "Tuercas", "ASTM A-563"  },
+                    new List<string> { "|", "Galvanización", "ASTM A-123, ASTM A-153"  },
+                    new List<string> { "|", "Columnas ", "Celosía "  },
+                    new List<string> { "|", "Vigas", "Celosía "  },
                 };
 
                 // Llamado a los métodos para editar el documento con la información
@@ -155,13 +156,19 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo3, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo4, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo5, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, 1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo6, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2, 1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
 
@@ -202,14 +209,19 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, 2);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo3, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo4, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo5, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo6, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
 
@@ -234,6 +246,7 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
 
@@ -318,8 +331,11 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 2, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaSalidaImagen, 10, 2, FuncionesCreacion.AlineacionImagen.Centro);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, "Donde:", 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
 
@@ -347,6 +363,7 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 2, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo3, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo4, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
@@ -366,7 +383,7 @@ namespace funcionalidades_documento.componentes_reporte
             try
             {
                 // Definicion de los titulos y parrafos
-                string titulo = "cargas de sismo";
+                string titulo = "cargas de montaje y mantenimiento";
                 string parrafo1 = "Todos los miembros de las estructuras en análisis cuyo eje longitudinal forme un ángulo con la horizontal menor que 45 grados tendrán suficiente sección para resistir una carga adicional de 150 daN vertical, aplicada en cualquier punto de su eje longitudinal.";
                 string parrafo2 = "Considerando las cargas de montaje y mantenimiento para columnas: el castillete será diseñado para resistir la acción de un hombre con herramienta de montaje que equivale a aplicar verticalmente un peso aproximado de 150 daN.";
                 string parrafo3 = "Considerando las cargas de montaje y mantenimiento para vigas: el nodo donde llega cada barraje, será diseñado para resistir la acción de dos hombres con herramienta de montaje que equivale a aplicar verticalmente un peso aproximado de 250 daN. ";
@@ -374,7 +391,9 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 2, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo3, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
 
@@ -446,6 +465,7 @@ namespace funcionalidades_documento.componentes_reporte
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, 1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos2, 1);
@@ -453,6 +473,7 @@ namespace funcionalidades_documento.componentes_reporte
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos3, 1);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo2, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarParrafo(ruta, "Donde,", 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesParrafo.AgregarListado(ruta, datos, 12, FuncionesCreacion.EstiloParrafo.Normal);
@@ -528,13 +549,31 @@ namespace funcionalidades_documento.componentes_reporte
 
                 string base64Imagen = "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";
 
+                List<List<string>> datos2 = new List<List<string>> {
+                    new List<string> { "z", "~", "~", "~", "z", "~", "~", "~" },
+                    new List<string> { "nombres", "~", "firma", "matricula", "total paginas", "1006", "fecha emision", "2022.09.16" },
+                    new List<string> { "elaboro", "c.castaño", "firma", "267773 ANT", "nombre proyecto", "~", "~", "~" },
+                    new List<string> { "reviso", "C.METRIO", "firma", "357197 ANT", "RENOVACIÓN SUBESTACIÓN BANADÍA 230 kV", "~", "~", "~" },
+                    new List<string> { "|", "|", "|", "|", "Código del Documento", "~", "~", "~" },
+                    new List<string> { "Aprobó", "I. VILLALBA", "firma", "196375 ANT", "CO-RBAN-14113-S-01-D1531", "~", "~", "~" },
+                };
+
+                List<List<string>> datos3 = new List<List<string>> {
+                    new List<string> { base64Imagen, base64Imagen },
+                    new List<string> { base64Imagen, base64Imagen },
+                };
+
+
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarParrafo(ruta, parrafo1, 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, 1, true);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                PropiedadesTabla.AgregarTablaDesdeLista2(ruta, datos3, 0);
                 PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaSalidaImagen, 11, 5, FuncionesCreacion.AlineacionImagen.Centro);
-                PropiedadesImagen.AgregarImagenDesdeBase64(ruta, base64Imagen, 5, 5, FuncionesCreacion.AlineacionImagen.Centro);
+                //PropiedadesImagen.AgregarImagenDesdeBase64(ruta, base64Imagen, 5, 5, FuncionesCreacion.AlineacionImagen.Centro);
+                
             }
             catch (Exception ex)
             {

@@ -2,13 +2,18 @@
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using System.Text.RegularExpressions;
+using Microsoft.Office.Interop.Word;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TableCellProperties = DocumentFormat.OpenXml.Drawing.TableCellProperties;
 using Word = Microsoft.Office.Interop.Word;
+using static funcionalidades_documento.crear_documento.FuncionesCreacion;
+using funcionalidades_documento.funciones_imagenes;
 
 namespace funcionalidades_documento.funciones_tablas
 {
@@ -219,8 +224,9 @@ namespace funcionalidades_documento.funciones_tablas
                         // Si se especificó un número de filas con fondo, darle fondo gris y poner la letra en negrita y centrada
                         if (filasConFondo > 0 && rowIndex < filasConFondo)
                         {
-                            cellProperties.Append(new Shading() { Val = ShadingPatternValues.Clear, Fill = "f0f0f0" });
-                            run.RunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties(new Bold(), new Justification() { Val = JustificationValues.Center });
+                            cellProperties.Append(new DocumentFormat.OpenXml.Wordprocessing.Shading() { Val = ShadingPatternValues.Clear, Fill = "f0f0f0" });
+                            paragraph.ParagraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(new Justification() { Val = JustificationValues.Center });
+                            run.RunProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties(new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" }, new Bold());
                         }
 
                         // Set the font to Arial and font size to 10
@@ -243,5 +249,109 @@ namespace funcionalidades_documento.funciones_tablas
 
             Console.WriteLine($"Se agregó una tabla al documento.");
         }
+
+        public static void AgregarTablaDesdeLista2(string ruta, List<List<string>> datos, int filasConFondo = 0, bool sinBordes = false)
+        {
+            if (datos == null || !datos.Any())
+            {
+                throw new ArgumentNullException(nameof(datos), "Los datos no pueden ser nulos o vacíos.");
+            }
+
+            using (var document = WordprocessingDocument.Open(ruta, true))
+            {
+                var body = document.MainDocumentPart.Document.Body;
+                var mainPart = document.MainDocumentPart;
+
+                // Crea la tabla
+                DocumentFormat.OpenXml.Wordprocessing.Table table = new DocumentFormat.OpenXml.Wordprocessing.Table();
+
+                // Define el ancho de la tabla al 100% del ancho del documento
+                TableWidth tableWidth = new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct };
+
+                // Define los bordes de la tabla
+                DocumentFormat.OpenXml.Wordprocessing.TableBorders tblBorders = new DocumentFormat.OpenXml.Wordprocessing.TableBorders(
+                    new DocumentFormat.OpenXml.Wordprocessing.TopBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.BottomBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.LeftBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.RightBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 },
+                    new DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder { Val = DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single, Size = 6 }
+                );
+
+                DocumentFormat.OpenXml.Wordprocessing.TableProperties tblProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties();
+                tblProperties.Append(tableWidth);
+                if (!sinBordes)
+                {
+                    tblProperties.Append(tblBorders);
+                }
+                table.Append(tblProperties);
+
+                for (int rowIndex = 0; rowIndex < datos.Count; rowIndex++)
+                {
+                    DocumentFormat.OpenXml.Wordprocessing.TableRow row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+                    int currentColumnCount = datos[rowIndex].Count;
+
+                    for (int colIndex = 0; colIndex < currentColumnCount; colIndex++)
+                    {
+                        var cellText = datos[rowIndex][colIndex];
+
+                        DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
+                        DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
+                        DocumentFormat.OpenXml.Wordprocessing.Run run = new DocumentFormat.OpenXml.Wordprocessing.Run();
+
+                        // Verifica si el texto de la celda es un base64
+                        if (Regex.IsMatch(cellText, @"^[a-zA-Z0-9+/]*={0,2}$"))
+                        {
+                            Drawing imageElement = PropiedadesImagen.ObtenerImagenDesdeBase64(mainPart, cellText, 5, 5, AlineacionImagen.Centro);
+                            run.Append(imageElement);
+                        }
+                        else
+                        {
+                            // Verifica si la celda debe ser combinada horizontalmente
+                            if (cellText.Contains("~"))
+                            {
+                                cellText = cellText.Replace("~", "");
+                                // Define la celda como una celda de continuación de combinación horizontal
+                                cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(new HorizontalMerge() { Val = MergedCellValues.Continue });
+                            }
+                            else
+                            {
+                                // Define la celda como una celda de inicio de combinación horizontal
+                                cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(new HorizontalMerge() { Val = MergedCellValues.Restart });
+                            }
+
+                            // Verifica si la celda debe ser combinada verticalmente
+                            if (cellText.Contains("|"))
+                            {
+                                cellText = cellText.Replace("|", "");
+                                // Define la celda como una celda de continuación de combinación vertical
+                                cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(new VerticalMerge() { Val = MergedCellValues.Continue });
+                            }
+                            else
+                            {
+                                // Define la celda como una celda de inicio de combinación vertical
+                                cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(new VerticalMerge() { Val = MergedCellValues.Restart });
+                            }
+
+                            run.Append(new DocumentFormat.OpenXml.Wordprocessing.Text(cellText));
+                        }
+
+                        paragraph.Append(run);
+                        cell.Append(paragraph);
+                        row.Append(cell);
+                    }
+
+                    table.Append(row);
+                }
+
+
+                body.Append(table);
+                document.MainDocumentPart.Document.Save();
+            }
+
+            Console.WriteLine($"Se agregó una tabla al documento.");
+        }
+
+
     }
 }
