@@ -287,7 +287,7 @@ namespace funcionalidades_documento.funciones_parrafo
         /// <param name="ruta">Aquí va la ruta del documento de word</param>
         /// <param name="numSaltos">Aquí se pasa un valor numérico con los saltos de línea</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void AgregarSaltosDeLinea(string ruta, int numSaltos)
+        public static void AgregarSaltosDeLinea(string ruta, int numEspacios)
         {
             ValidarRutaArchivo(ruta);
 
@@ -300,13 +300,13 @@ namespace funcionalidades_documento.funciones_parrafo
 
                 var body = document.MainDocumentPart.Document.Body;
 
-                for (int i = 0; i < numSaltos; i++)
+                for (int i = 0; i < numEspacios; i++)
                 {
-                    body.AppendChild(new Paragraph(new Run(new Break())));
+                    body.AppendChild(new Paragraph(new Run(new Text("\n"))));
                 }
             }
 
-            Console.WriteLine($"Agregando {numSaltos} saltos de línea al documento");
+            Console.WriteLine($"Agregando {numEspacios} espacios al documento");
         }
 
         /// <summary>
