@@ -295,54 +295,64 @@ namespace funcionalidades_documento.funciones_tablas
                     {
                         var cellText = datos[rowIndex][colIndex];
 
-                        DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
-                        DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
-                        DocumentFormat.OpenXml.Wordprocessing.Run run = new DocumentFormat.OpenXml.Wordprocessing.Run();
-
                         // Verifica si el texto de la celda es un base64
-                        if (Regex.IsMatch(cellText, @"^[a-zA-Z0-9+/]*={0,2}$"))
+                        if (cellText.StartsWith("[B64]") && Regex.IsMatch(cellText.Substring(5), @"^[a-zA-Z0-9+/]*={0,2}$"))
                         {
-                            Drawing imageElement = PropiedadesImagen.ObtenerImagenDesdeBase64(mainPart, cellText, 5, 5, AlineacionImagen.Centro);
-                            run.Append(imageElement);
+                            Drawing imageElement = PropiedadesImagen.ObtenerImagenDesdeBase64(mainPart, cellText.Substring(5), 5, 5, AlineacionImagen.Centro);
+
+                            DocumentFormat.OpenXml.Wordprocessing.TableCell innerCell = new DocumentFormat.OpenXml.Wordprocessing.TableCell(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new DocumentFormat.OpenXml.Wordprocessing.Run(imageElement)));
+                            row.Append(innerCell);
+                            continue;
+                        }
+
+                        // Crea la celda
+                        DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
+
+                        // Define las propiedades de la celda
+                        DocumentFormat.OpenXml.Wordprocessing.TableCellProperties cellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties();
+                        cellProperties.Append(new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center });
+                        cell.Append(cellProperties);
+
+                        // Verifica combinaciones
+                        bool isMergedHorizontally = false;
+                        bool isMergedVertically = false;
+
+                        if (cellText.Contains("~"))
+                        {
+                            cellText = cellText.Replace("~", "");
+                            isMergedHorizontally = true;
+                            cellProperties.Append(new HorizontalMerge() { Val = MergedCellValues.Continue });
                         }
                         else
                         {
-                            // Verifica si la celda debe ser combinada horizontalmente
-                            if (cellText.Contains("~"))
-                            {
-                                cellText = cellText.Replace("~", "");
-                                // Define la celda como una celda de continuación de combinación horizontal
-                                cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(new HorizontalMerge() { Val = MergedCellValues.Continue });
-                            }
-                            else
-                            {
-                                // Define la celda como una celda de inicio de combinación horizontal
-                                cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(new HorizontalMerge() { Val = MergedCellValues.Restart });
-                            }
-
-                            // Verifica si la celda debe ser combinada verticalmente
-                            if (cellText.Contains("|"))
-                            {
-                                cellText = cellText.Replace("|", "");
-                                // Define la celda como una celda de continuación de combinación vertical
-                                cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(new VerticalMerge() { Val = MergedCellValues.Continue });
-                            }
-                            else
-                            {
-                                // Define la celda como una celda de inicio de combinación vertical
-                                cell.TableCellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties(new VerticalMerge() { Val = MergedCellValues.Restart });
-                            }
-
-                            run.Append(new DocumentFormat.OpenXml.Wordprocessing.Text(cellText));
+                            cellProperties.Append(new HorizontalMerge() { Val = MergedCellValues.Restart });
                         }
 
-                        paragraph.Append(run);
-                        cell.Append(paragraph);
+                        if (cellText.Contains("|"))
+                        {
+                            cellText = cellText.Replace("|", "");
+                            isMergedVertically = true;
+                            cellProperties.Append(new VerticalMerge() { Val = MergedCellValues.Continue });
+                        }
+                        else
+                        {
+                            cellProperties.Append(new VerticalMerge() { Val = MergedCellValues.Restart });
+                        }
+
+                        if (!isMergedHorizontally || !isMergedVertically || !string.IsNullOrWhiteSpace(cellText))
+                        {
+                            DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
+                            DocumentFormat.OpenXml.Wordprocessing.Run run = new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(cellText));
+                            paragraph.Append(run);
+                            cell.Append(paragraph);
+                        }
+
                         row.Append(cell);
                     }
 
                     table.Append(row);
                 }
+
 
 
                 body.Append(table);
