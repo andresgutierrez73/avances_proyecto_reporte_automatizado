@@ -559,8 +559,8 @@ namespace funcionalidades_documento.componentes_reporte
                 };
 
                 List<List<string>> datos3 = new List<List<string>> {
-                    new List<string> { base64Imagen, base64Imagen },
-                    new List<string> { base64Imagen, base64Imagen },
+                    new List<string> { "[B64]" + base64Imagen, base64Imagen },
+                    new List<string> { base64Imagen, "~" },
                 };
 
 
