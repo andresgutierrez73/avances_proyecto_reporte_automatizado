@@ -38,83 +38,16 @@ namespace funcionalidades_documento.funciones_tablas
             }
         }
 
-        public static void AgregarTablaDatosGrandes(string ruta, List<List<string>> listaDatos, List<string> listaColumnas)
-        {
-            ValidarRutaArchivo(ruta);
-
-            using (var document = WordprocessingDocument.Open(ruta, true))
-            {
-                if (document == null)
-                {
-                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
-                }
-
-                var body = document.MainDocumentPart.Document.Body;
-
-                // Crea la tabla
-                DocumentFormat.OpenXml.Wordprocessing.Table table = new DocumentFormat.OpenXml.Wordprocessing.Table();
-
-                // Define el ancho de la tabla al 100% del ancho del documento
-                TableWidth tableWidth = new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct };
-
-                // Define el borde de la tabla
-                DocumentFormat.OpenXml.Wordprocessing.TableBorders tblBorders = new DocumentFormat.OpenXml.Wordprocessing.TableBorders(
-                    new DocumentFormat.OpenXml.Wordprocessing.TopBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 },
-                    new DocumentFormat.OpenXml.Wordprocessing.BottomBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 },
-                    new DocumentFormat.OpenXml.Wordprocessing.LeftBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 },
-                    new DocumentFormat.OpenXml.Wordprocessing.RightBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 },
-                    new DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 },
-                    new DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder { Val = new EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues>(DocumentFormat.OpenXml.Wordprocessing.BorderValues.Single), Size = 0 }
-                );
-
-                DocumentFormat.OpenXml.Wordprocessing.TableProperties tblProperties = new DocumentFormat.OpenXml.Wordprocessing.TableProperties(tableWidth, tblBorders);
-                table.Append(tblProperties);
-
-                // Agrega una fila de encabezado con los valores de listaColumnas
-                DocumentFormat.OpenXml.Wordprocessing.TableRow headerRow = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
-                foreach (var header in listaColumnas)
-                {
-                    DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell(
-                        new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
-                            new DocumentFormat.OpenXml.Wordprocessing.Run(
-                                new DocumentFormat.OpenXml.Wordprocessing.Text(header)
-                            )
-                        )
-                    );
-                    headerRow.Append(cell);
-                }
-                table.Append(headerRow);
-
-                // Crea las filas y columnas restantes
-                int maxRowCount = listaDatos.Max(list => list.Count);
-                for (int i = 0; i < maxRowCount; i++)
-                {
-                    DocumentFormat.OpenXml.Wordprocessing.TableRow row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
-                    for (int j = 0; j < listaColumnas.Count; j++)
-                    {
-                        var cellValue = i < listaDatos[j].Count ? listaDatos[j][i] : string.Empty;
-
-                        DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell(
-                            new DocumentFormat.OpenXml.Wordprocessing.Paragraph(
-                                new DocumentFormat.OpenXml.Wordprocessing.Run(
-                                    new DocumentFormat.OpenXml.Wordprocessing.Text(cellValue)
-                                )
-                            )
-                        );
-                        row.Append(cell);
-                    }
-                    table.Append(row);
-                }
-
-                // Añade la tabla al documento
-                body.Append(table);
-
-                document.MainDocumentPart.Document.Save();
-            }
-
-            Console.WriteLine($"Se agregó una tabla al documento.");
-        }
-
+        /// <summary>
+        /// Método para la creacion de tablas personalizadas en el documento
+        /// </summary>
+        /// <param name="ruta">Aquí va la ruta del directorio donde se encuentra ubicado el documento</param>
+        /// <param name="datos">Aquí va una lista de listas, eso con el proposito de hacer mas dinámica la longitud
+        /// de las tablas que se crean</param>
+        /// <param name="filasConFondo">Aquí se pasa la cantidad de filas que van a actuar como encabezado la diferencia
+        /// con respecto a las otras es que estas van a estar centradas y con un color de fondo de celda asigando</param>
+        /// <param name="sinBordes">Aquí se pasa un booleando como parámetro por defecto las tables siempre van a tener bordes, pero si se quiere tener una tabla la cual no tenga bordes se pasa el valor de true</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public static void AgregarTablaDesdeLista(string ruta, List<List<string>> datos, int filasConFondo = 0, bool sinBordes = false)
         {
             if (datos == null || !datos.Any())
@@ -250,6 +183,14 @@ namespace funcionalidades_documento.funciones_tablas
             Console.WriteLine($"Se agregó una tabla al documento.");
         }
 
+        /// <summary>
+        /// Método para crear la tabla de firmas del documento
+        /// </summary>
+        /// <param name="ruta">Aquí va la ruta del directorio donde se encuentra ubicado el documento</param>
+        /// <param name="datos">Aquí va una lista de listas, eso con el proposito de hacer mas dinámica la longitud
+        /// de las tablas que se crean</param>
+        /// <param name="sinBordes">Aquí se pasa un booleando como parámetro por defecto las tables siempre van a tener bordes, pero si se quiere tener una tabla la cual no tenga bordes se pasa el valor de true</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public static void AgregarTablaPiePagina(string ruta, List<List<string>> datos, bool sinBordes = false)
         {
             if (datos == null || !datos.Any())

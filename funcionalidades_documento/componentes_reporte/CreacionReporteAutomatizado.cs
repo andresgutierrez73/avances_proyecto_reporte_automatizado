@@ -72,7 +72,7 @@ namespace funcionalidades_documento.componentes_reporte
                 };
 
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos);
-                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 2);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 SeccionesCuerpoReporte.TablaEjemplo(ruta);
 
 
@@ -101,9 +101,10 @@ namespace funcionalidades_documento.componentes_reporte
                 string encabezadoBajo = "MEMORIA DE DISEÑO DE ESTRUCTURAS METÁLICAS DE PÓRTICOS";
                 string pie = "Archivo: CO-RBAN-14113-S-01-D1531";
 
+
                 //Llamado a los métodos para editar el encabezado y pie
                 EditarEncabezadoPie.EditarEncabezado(ruta, encabezadoAlto, encabezadoBajo, 2);
-                EditarEncabezadoPie.EditarPieDePagina(ruta, pie);
+                EditarEncabezadoPie.EditarPieDePagina(ruta, pie, "");
 
                 SeccionesCuerpoReporte.Objeto(ruta);
                 SeccionesCuerpoReporte.Alcance(ruta);

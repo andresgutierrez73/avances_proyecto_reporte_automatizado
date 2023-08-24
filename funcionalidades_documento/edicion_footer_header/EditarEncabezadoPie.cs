@@ -211,6 +211,11 @@ namespace funcionalidades_documento.edicion_footer_header
             }
         }
 
+        /// <summary>
+        /// Método que retorna un objeto de tipo Footer con un formato específico como en este caso que es un tabla personalizada con un texto
+        /// </summary>
+        /// <param name="textoPie">Aquí se recibe un texto, le cual va a ser el que se vera en el pie de página del documento</param>
+        /// <returns>Esté método retorna un pie de página, por lo cual no lo agrega directemente al documento</returns>
         public static Footer nuevoPie(string textoPie)
         {
             Footer footer = new Footer();
@@ -274,7 +279,14 @@ namespace funcionalidades_documento.edicion_footer_header
             return footer;
         }
 
-        public static void EditarPieDePagina(string ruta, string texto)
+        /// <summary>
+        /// Método encargado de recibir un texto y de manipula un footer para insertarlo en el documento
+        /// </summary>
+        /// <param name="ruta">Aquí va la ruta del documento de word</param>
+        /// <param name="texto">Aquí va el texto que se mostrará en todos los pie de página del docuento exceptuando el inicio</param>
+        /// <param name="textoPrimeraPagina"></param>
+        /// <exception cref="ArgumentNullException">Aquí va el texto que irá en el pie de la primera página del documento</exception>
+        public static void EditarPieDePagina(string ruta, string texto, string textoPrimeraPagina)
         {
             ValidarRutaArchivo(ruta);
 
@@ -287,6 +299,7 @@ namespace funcionalidades_documento.edicion_footer_header
 
                 var mainPart = document.MainDocumentPart;
 
+                // Pie de página para las demás páginas
                 FooterPart footerPart;
                 if (mainPart.FooterParts.Count() > 0)
                 {
@@ -299,24 +312,33 @@ namespace funcionalidades_documento.edicion_footer_header
                 }
 
                 var footer = nuevoPie(texto);
-
                 footerPart.Footer = footer;
 
-                // Agregar la referencia al pie de página en el documento principal
+                // Pie de página para la primera página
+                FooterPart firstPageFooterPart = mainPart.AddNewPart<FooterPart>();
+                var firstPageFooter = nuevoPie(textoPrimeraPagina); // Puedes reemplazar "nuevoPie" con otro método si deseas un diseño diferente
+                firstPageFooterPart.Footer = firstPageFooter;
+                firstPageFooterPart.Footer.Save();
+
+                SectionProperties sectionProperties;
                 if (mainPart.Document.Body.Elements<SectionProperties>().Any())
                 {
-                    SectionProperties sectionProperties = mainPart.Document.Body.Elements<SectionProperties>().First();
-                    FooterReference footerReference = new FooterReference { Id = mainPart.GetIdOfPart(footerPart) };
-                    sectionProperties.RemoveAllChildren<FooterReference>();
-                    sectionProperties.PrependChild(footerReference);
+                    sectionProperties = mainPart.Document.Body.Elements<SectionProperties>().First();
                 }
                 else
                 {
-                    mainPart.Document.Body.Append(new SectionProperties(new FooterReference { Id = mainPart.GetIdOfPart(footerPart) }));
+                    sectionProperties = new SectionProperties();
+                    mainPart.Document.Body.Append(sectionProperties);
                 }
+
+                // Elimina referencias existentes y agrega nuevas referencias
+                sectionProperties.RemoveAllChildren<FooterReference>();
+                sectionProperties.Append(new FooterReference { Id = mainPart.GetIdOfPart(footerPart), Type = HeaderFooterValues.Default }); // Para las demás páginas
+                sectionProperties.Append(new FooterReference { Id = mainPart.GetIdOfPart(firstPageFooterPart), Type = HeaderFooterValues.First }); // Para la primera página
 
                 document.Save();
             }
         }
+
     }
 }
