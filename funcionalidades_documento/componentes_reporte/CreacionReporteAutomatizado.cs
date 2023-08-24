@@ -72,6 +72,9 @@ namespace funcionalidades_documento.componentes_reporte
                 };
 
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 2);
+                SeccionesCuerpoReporte.TablaEjemplo(ruta);
+
 
                 // Insertamos el salto de pagina
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);

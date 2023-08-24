@@ -250,7 +250,7 @@ namespace funcionalidades_documento.funciones_tablas
             Console.WriteLine($"Se agregó una tabla al documento.");
         }
 
-        public static void AgregarTablaDesdeLista2(string ruta, List<List<string>> datos, int filasConFondo = 0, bool sinBordes = false)
+        public static void AgregarTablaPiePagina(string ruta, List<List<string>> datos, bool sinBordes = false)
         {
             if (datos == null || !datos.Any())
             {
@@ -294,33 +294,58 @@ namespace funcionalidades_documento.funciones_tablas
                     for (int colIndex = 0; colIndex < currentColumnCount; colIndex++)
                     {
                         var cellText = datos[rowIndex][colIndex];
+                        DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
+                        DocumentFormat.OpenXml.Wordprocessing.TableCellProperties cellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties();
 
-                        // Verifica si el texto de la celda es un base64
+                        // Si es una imagen base64
                         if (cellText.StartsWith("[B64]") && Regex.IsMatch(cellText.Substring(5), @"^[a-zA-Z0-9+/]*={0,2}$"))
                         {
-                            Drawing imageElement = PropiedadesImagen.ObtenerImagenDesdeBase64(mainPart, cellText.Substring(5), 5, 5, AlineacionImagen.Centro);
+                            // MODIFICACIÓN: Cambia las dimensiones en función de si es la primera fila o no
+                            int imgAncho = rowIndex == 0 ? 3 : 2;  // Supongamos que para la primera fila quieres que sea 5
+                            int imgAlto = rowIndex == 0 ? 2 : 1;   // Y aquí, por ejemplo, que sea 4
 
-                            DocumentFormat.OpenXml.Wordprocessing.TableCell innerCell = new DocumentFormat.OpenXml.Wordprocessing.TableCell(new DocumentFormat.OpenXml.Wordprocessing.Paragraph(new DocumentFormat.OpenXml.Wordprocessing.Run(imageElement)));
-                            row.Append(innerCell);
-                            continue;
+                            Drawing imageElement = PropiedadesImagen.ObtenerImagenDesdeBase64(mainPart, cellText.Substring(5), imgAncho, imgAlto, AlineacionImagen.Centro);
+
+                            // Crear un párrafo
+                            DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
+
+                            // Establecer las propiedades de alineación del párrafo para centrar
+                            DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties paragraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(
+                                new DocumentFormat.OpenXml.Wordprocessing.Justification() { Val = DocumentFormat.OpenXml.Wordprocessing.JustificationValues.Center }
+                            );
+                            paragraph.Append(paragraphProperties);
+
+                            // Agregar la imagen al párrafo
+                            DocumentFormat.OpenXml.Wordprocessing.Run run = new DocumentFormat.OpenXml.Wordprocessing.Run(imageElement);
+                            paragraph.Append(run);
+
+                            // Agregar el párrafo a la celda
+                            cell.Append(paragraph);
+                        }
+                        else // Si es texto
+                        {
+                            DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
+                            DocumentFormat.OpenXml.Wordprocessing.Run run = new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(cellText));
+
+                            // Establecer la fuente a Arial, el tamaño de la fuente a 10, y centrar el texto
+                            DocumentFormat.OpenXml.Wordprocessing.RunProperties runProperties = new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+                            runProperties.Append(new DocumentFormat.OpenXml.Wordprocessing.RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" });
+                            runProperties.Append(new DocumentFormat.OpenXml.Wordprocessing.FontSize() { Val = "20" });
+                            run.PrependChild(runProperties);
+
+                            // Centrar el texto
+                            DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties paragraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties();
+                            paragraphProperties.Append(new DocumentFormat.OpenXml.Wordprocessing.Justification() { Val = JustificationValues.Center });
+                            paragraph.PrependChild(paragraphProperties);
+
+                            paragraph.Append(run);
+                            cell.Append(paragraph);
                         }
 
-                        // Crea la celda
-                        DocumentFormat.OpenXml.Wordprocessing.TableCell cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell();
-
-                        // Define las propiedades de la celda
-                        DocumentFormat.OpenXml.Wordprocessing.TableCellProperties cellProperties = new DocumentFormat.OpenXml.Wordprocessing.TableCellProperties();
-                        cellProperties.Append(new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center });
-                        cell.Append(cellProperties);
-
-                        // Verifica combinaciones
-                        bool isMergedHorizontally = false;
-                        bool isMergedVertically = false;
-
+                        // Combinación de celdas
                         if (cellText.Contains("~"))
                         {
                             cellText = cellText.Replace("~", "");
-                            isMergedHorizontally = true;
                             cellProperties.Append(new HorizontalMerge() { Val = MergedCellValues.Continue });
                         }
                         else
@@ -331,7 +356,6 @@ namespace funcionalidades_documento.funciones_tablas
                         if (cellText.Contains("|"))
                         {
                             cellText = cellText.Replace("|", "");
-                            isMergedVertically = true;
                             cellProperties.Append(new VerticalMerge() { Val = MergedCellValues.Continue });
                         }
                         else
@@ -339,13 +363,8 @@ namespace funcionalidades_documento.funciones_tablas
                             cellProperties.Append(new VerticalMerge() { Val = MergedCellValues.Restart });
                         }
 
-                        if (!isMergedHorizontally || !isMergedVertically || !string.IsNullOrWhiteSpace(cellText))
-                        {
-                            DocumentFormat.OpenXml.Wordprocessing.Paragraph paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
-                            DocumentFormat.OpenXml.Wordprocessing.Run run = new DocumentFormat.OpenXml.Wordprocessing.Run(new DocumentFormat.OpenXml.Wordprocessing.Text(cellText));
-                            paragraph.Append(run);
-                            cell.Append(paragraph);
-                        }
+                        cellProperties.Append(new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center });
+                        cell.Append(cellProperties);
 
                         row.Append(cell);
                     }
@@ -353,15 +372,11 @@ namespace funcionalidades_documento.funciones_tablas
                     table.Append(row);
                 }
 
-
-
                 body.Append(table);
                 document.MainDocumentPart.Document.Save();
             }
 
             Console.WriteLine($"Se agregó una tabla al documento.");
         }
-
-
     }
 }
