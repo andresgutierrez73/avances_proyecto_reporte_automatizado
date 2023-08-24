@@ -35,15 +35,16 @@ namespace funcionalidades_documento.funciones_imagenes
                 throw new ArgumentException("La ruta debe tener una extensión .docx");
             }
         }
-        
-/// <summary>
+
+        /// <summary>
         /// Método para agregar una imágen a partir de una ruta del escritorio
         /// </summary>
         /// <param name="rutaDocumento">Aquí va la ruta del documento de word</param>
         /// <param name="rutaImagen">Aquí se pasa un string con la ruta del imágen en el explorador de archivos</param>
-        /// <param name="ancho"></param>
-        /// <param name="alto"></param>
-        /// <param name="alineacion"></param>
+        /// <param name="ancho">Aquí se pasa la longitud en cm del ancho de la imágen del documento</param>
+        /// <param name="alto">Aquí se pasa la longitud en cm del alto de la imágen del documento</param>
+        /// <param name="alineacion">Aquí se pasa un enum con un valor el cual determinará la alineación de la imágen dentro
+        /// del documento</param>
         /// <exception cref="ArgumentNullException"></exception>
         public static void AgregarImagenDesdeArchivo(string rutaDocumento, string rutaImagen, int ancho, int alto, AlineacionImagen alineacion)
         {
@@ -131,6 +132,17 @@ namespace funcionalidades_documento.funciones_imagenes
             Console.WriteLine($"Imagen {rutaImagen} añadida al documento {rutaDocumento}");
         }
 
+        /// <summary>
+        /// Método para insertar una imágen decodificada en base64, este método inserta directamente la imágen dentro del
+        /// contenido del documento, por lo que si se quiere insertar algo inmediato dentro del documento este es el método a usar
+        /// </summary>
+        /// <param name="rutaDocumento">Aquí va la ruta del documento de word</param>
+        /// <param name="imagenBase64">Aquí se pasa un string que tenga toda la cadena de caracteres en base64 de la imágen</param>
+        /// <param name="ancho">Aquí se pasa la longitud en cm del ancho de la imágen del documento</param>
+        /// <param name="alto">Aquí se pasa la longitud en cm del alto de la imágen del documento</param>
+        /// <param name="alineacion">Aquí se pasa un enum con un valor el cual determinará la alineación de la imágen dentro
+        /// del documento</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public static void AgregarImagenDesdeBase64(string rutaDocumento, string imagenBase64, int ancho, int alto, AlineacionImagen alineacion)
         {
             // Aquí se multiplican los valores por esta cantidad, para hacer la convesión de EMU a cm
@@ -219,6 +231,18 @@ namespace funcionalidades_documento.funciones_imagenes
             Console.WriteLine($"Imagen añadida al documento {rutaDocumento}");
         }
 
+        /// <summary>
+        /// Método para insertar una imágen decodificada en base64, este método necesita una mayor manupulación ya que no inserta
+        /// directemente la imágen en el contenido del documento, este en el caso del reporte se usa como complemento de un método
+        /// que inserta una tabla con imágenes
+        /// </summary>
+        /// <param name="rutaDocumento">Aquí va la ruta del documento de word</param>
+        /// <param name="imagenBase64">Aquí se pasa un string que tenga toda la cadena de caracteres en base64 de la imágen</param>
+        /// <param name="ancho">Aquí se pasa la longitud en cm del ancho de la imágen del documento</param>
+        /// <param name="alto">Aquí se pasa la longitud en cm del alto de la imágen del documento</param>
+        /// <param name="alineacion">Aquí se pasa un enum con un valor el cual determinará la alineación de la imágen dentro
+        /// del documento</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public static Drawing ObtenerImagenDesdeBase64(MainDocumentPart mainPart, string imagenBase64, int ancho, int alto, AlineacionImagen alineacion)
         {
             // Conversión de dimensiones de centímetros a EMU.
