@@ -36,7 +36,7 @@ namespace funcionalidades_documento.componentes_reporte
                     new List<string> { "|", "|", "|", "|", "CO-RBAN-14113-S-01-D1531", "~", "~", "~",  },
                 };
 
-            PropiedadesTabla.AgregarTablaPiePagina(ruta, datos3);
+            PropiedadesTabla.AgregarTablaConImagen(ruta, datos3);
         }
 
         public static void Objeto(string ruta)

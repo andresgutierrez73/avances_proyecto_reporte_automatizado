@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace funcionalidades_documento.crear_documento
 {
@@ -44,7 +45,7 @@ namespace funcionalidades_documento.crear_documento
         /// </summary>
         /// <param name="ruta">Aquí va la ruta del docuemento de wordAquí va la ruta del docuemento de word</param>
         /// <exception cref="ArgumentException"></exception>
-        public static void GenerarDocumentoWord(string ruta)
+        public static void GenerarDocumentoWord(string ruta, DimesionHoja tamanoHoja)
         {
             // Validar que la ruta no esté vacía
             if (string.IsNullOrEmpty(ruta))
@@ -64,7 +65,60 @@ namespace funcionalidades_documento.crear_documento
             {
                 // Agregar el MainDocumentPart y establecer el contenido del documento
                 var mainPart = document.AddMainDocumentPart();
-                mainPart.Document = new Document(new Body());
+                mainPart.Document = new Document();
+
+                // Asegurarse de que Body está inicializado
+                if (mainPart.Document.Body == null)
+                {
+                    mainPart.Document.Body = new Body();
+                }
+
+                // Agregar las propiedades de sección al cuerpo
+                SectionProperties sectionProps = new SectionProperties();
+
+                // Variables con la dimensión de la hoja
+                double ancho, alto;
+
+                switch (tamanoHoja)
+                {
+                    case DimesionHoja.A3:
+                        ancho = 29.7;
+                        alto = 42.0;
+                        break;
+                    case DimesionHoja.A4:
+                        ancho = 21.0;
+                        alto = 29.7;
+                        break;
+                    case DimesionHoja.A5:
+                        ancho = 14.8;
+                        alto = 21.0;
+                        break;
+                    case DimesionHoja.B3:
+                        ancho = 35.3;
+                        alto = 50.0;
+                        break;
+                    case DimesionHoja.B4:
+                        ancho = 25.0;
+                        alto = 35.3;
+                        break;
+                    default:
+                        ancho = 21.0;
+                        alto = 29.7;
+                        break;
+                }
+
+                // Definir el tamaño de la hoja como A4
+                PageSize pageSize = new PageSize()
+                {
+                    Width = (UInt32Value)(ancho * 567),  // Ancho para A4 en vigésimos de punto
+                    Height = (UInt32Value)(alto * 567)  // Alto para A4 en vigésimos de punto
+                };
+                sectionProps.Append(pageSize);
+
+                // Agregar las propiedades de sección al cuerpo del documento
+                mainPart.Document.Body.Append(sectionProps);
+
+                mainPart.Document.Save();
             }
         }
 
@@ -98,6 +152,18 @@ namespace funcionalidades_documento.crear_documento
             Izquierda,
             Centro,
             Derecha
+        }
+
+        /// <summary>
+        /// Enum con los valores se los tamaños de hoja más comunes
+        /// </summary>
+        public enum DimesionHoja
+        {
+            A3,
+            A4,
+            A5,
+            B3,
+            B4
         }
     }
 }
