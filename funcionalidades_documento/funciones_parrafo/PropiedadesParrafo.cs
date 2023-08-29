@@ -421,7 +421,12 @@ namespace funcionalidades_documento.funciones_parrafo
             Console.WriteLine("Agregando tabla de contenido al documento.");
         }
 
-        // tabla de tablas
+        /// <summary>
+        /// Método para la creación de una tabla de tablas, en la cual se hace referencia a los titulos de las tablas del documento
+        /// </summary>
+        /// <param name="ruta">Aquí va la ruta del documento de word</param>
+        /// <param name="tituloTabla">Aquí va el título que va a tener la tabla de contenido</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public static void TablaTablas(string ruta, string tituloTabla)
         {
             ValidarRutaArchivo(ruta);
@@ -505,7 +510,12 @@ namespace funcionalidades_documento.funciones_parrafo
             }
         }
 
-        // tabla de ilustraciones
+        /// <summary>
+        /// Método para crear una tabla de contenido en la cual se hace referencia a los titulos de las imagenes (leyenda)
+        /// </summary>
+        /// <param name="ruta">Aquí va la ruta del documento de word</param>
+        /// <param name="tituloIlustraciones"></param>
+        /// <exception cref="ArgumentNullException">Aquí va el título que va a tener la tabla de contenido</exception>
         public static void TablaIlustraciones(string ruta, string tituloIlustraciones)
         {
             ValidarRutaArchivo(ruta);
@@ -544,24 +554,15 @@ namespace funcionalidades_documento.funciones_parrafo
 
                 sdtContent.Append(Titulo);
 
-                Paragraph Contenido = new Paragraph(
-                    new ParagraphProperties(
-                        new RunProperties(
-                            new Bold() { Val = false },
-                            new NoProof(),
-                            new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" }  // Fuente Arial
-                        )
-                    ),
-                    new Run(
-                        new FieldChar { FieldCharType = FieldCharValues.Begin, Dirty = true }
-                    ),
-                    new Run(
-                        new FieldCode(@"TOC \c ""Ilustracion"" \h \z \u") { Space = SpaceProcessingModeValues.Preserve }
-                    ),
-                    new Run(
-                        new FieldChar { FieldCharType = FieldCharValues.Separate }
-                    )
-                );
+                // Creando el código para la tabla de contenido
+                Run tocRun = new Run();
+                tocRun.Append(new FieldChar() { FieldCharType = FieldCharValues.Begin });
+                tocRun.Append(new FieldCode(@"TOC \c ""Imagen"" \h \z \u") { Space = SpaceProcessingModeValues.Preserve });
+                tocRun.Append(new FieldChar() { FieldCharType = FieldCharValues.Separate });
+                tocRun.Append(new Text("Table of Illustrations placeholder..."));  // Este es solo un marcador de posición. Word debería actualizarlo.
+                tocRun.Append(new FieldChar() { FieldCharType = FieldCharValues.End });
+
+                Paragraph Contenido = new Paragraph(tocRun);
                 sdtContent.Append(Contenido);
 
                 Paragraph ContenEnd = new Paragraph(
@@ -588,8 +589,6 @@ namespace funcionalidades_documento.funciones_parrafo
                 }
             }
         }
-
-
 
         /// <summary>
         /// Método para agregar una referencia / cita a un parrafo

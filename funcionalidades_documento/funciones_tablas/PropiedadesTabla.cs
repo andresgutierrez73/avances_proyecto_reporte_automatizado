@@ -31,14 +31,21 @@ namespace funcionalidades_documento.funciones_tablas
             }
         }
 
-        public static Paragraph TituloTablas(string message)
+        /// <summary>
+        /// Método encargado de hacel el prefijo de los titulos de las tablas
+        /// ademas de agregar una numeración especial para que los titulos de las tablas puedan ser referenciados 
+        /// dentro de una tabla de contenido
+        /// </summary>
+        /// <param name="mensaje">Aquí se pasa el titulo que va a ir ubicado encima de la tabla que se agrega al contenido</param>
+        /// <returns>retorna el parrafo con estilo para que pueda ser insertado en el documento</returns>
+        public static Paragraph TituloTablas(string mensaje)
         {
             // Crear y establecer las propiedades del párrafo
             Paragraph paragraph = new Paragraph();
 
             // Propiedades para centrar el párrafo
             Justification justification = new Justification() { Val = JustificationValues.Center };
-            ParagraphProperties paragraphProperties = new ParagraphProperties(justification, new ParagraphStyleId() { Val = "IEBNormal2" });
+            ParagraphProperties paragraphProperties = new ParagraphProperties(justification, new ParagraphStyleId() { Val = "IEBNormal1" });
             ParagraphMarkRunProperties paragraphMarkRunProperties = new ParagraphMarkRunProperties(new Languages() { Val = "es-CO" });
 
             paragraphProperties.Append(paragraphMarkRunProperties);
@@ -58,7 +65,7 @@ namespace funcionalidades_documento.funciones_tablas
             paragraph.Append(new Run(runProperties.CloneNode(true), new FieldCode(" SEQ Tabla \\* ARABIC ")));
             paragraph.Append(new Run(runProperties.CloneNode(true), new FieldChar() { FieldCharType = FieldCharValues.Separate }));
             paragraph.Append(new Run(runProperties.CloneNode(true), new FieldChar() { FieldCharType = FieldCharValues.End }));
-            paragraph.Append(new Run(runProperties.CloneNode(true), new Text(" " + message.Trim())));
+            paragraph.Append(new Run(runProperties.CloneNode(true), new Text(": " + mensaje.Trim())));
 
             return paragraph;
         }
@@ -188,6 +195,17 @@ namespace funcionalidades_documento.funciones_tablas
             Console.WriteLine($"Se agregó una tabla al documento.");
         }
 
+        /// <summary>
+        /// Método sobreconstruido en el cual se pasa el parametro del titulo de la tabla
+        /// </summary>
+        /// <param name="ruta">Aquí va el directorio donde este ubicado el documento de word</param>
+        /// <param name="datos">Aquí va una lista de listas, eso con el proposito de hacer mas dinámica la longitud
+        /// de las tablas que se crean</param>
+        /// <param name="titulo">Aquí se pasa el titullo que va a ir en el tabla, este será el parametro del método encargado de dar titulos a las tablas</param>
+        /// <param name="filasConFondo">Aquí se pasa la cantidad de filas que van a actuar como encabezado la diferencia
+        /// con respecto a las otras es que estas van a estar centradas y con un color de fondo de celda asigando</param>
+        /// <param name="sinBordes">Aquí se pasa un booleando como parámetro por defecto las tables siempre van a tener bordes, pero si se quiere tener una tabla la cual no tenga bordes se pasa el valor de true</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public static void AgregarTablaDesdeLista(string ruta, List<List<string>> datos, string titulo, int filasConFondo = 0, bool sinBordes = false)
         {
             if (datos == null || !datos.Any())
@@ -309,8 +327,6 @@ namespace funcionalidades_documento.funciones_tablas
 
             Console.WriteLine($"Se agregó una tabla con el título \"{titulo}\" al documento.");
         }
-
-
 
         /// <summary>
         /// Método para crear la tabla de firmas del documento
@@ -449,6 +465,16 @@ namespace funcionalidades_documento.funciones_tablas
             Console.WriteLine($"Se agregó una tabla al documento.");
         }
 
+        /// <summary>
+        /// Método encargado de insertar directamente en el documento de word una tabla
+        /// que puede contener imagenes dentro, las imágenes deben estar decodificadas en un base64
+        /// </summary>
+        /// <param name="footerPart">Aquí se pasa la seccion del footer o el pie de pagina en el cual va a ir ubicada la tabla</param>
+        /// <param name="datos">Se pasa una lista con una lista de strings para configuracion de las celdas de la tabla</param>
+        /// <param name="sinBordes">Aquí se pasa un booleando como parámetro por defecto las tables siempre van a tener bordes, pero si se quiere tener una tabla la cual no tenga bordes se pasa el valor de true</param>
+        /// <returns>retorna una tabla que puede ser insertada solo en el pie de pagina, esto con el proposito de que se van las imagenes dentro de la tabla
+        /// que esta ubicada en el pie de pagina</returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public static DocumentFormat.OpenXml.Wordprocessing.Table CrearTablaConImagen(FooterPart footerPart, List<List<string>> datos, bool sinBordes = false)
         {
             if (datos == null || !datos.Any())
@@ -568,7 +594,5 @@ namespace funcionalidades_documento.funciones_tablas
 
             return table;
         }
-
-
     }
 }
