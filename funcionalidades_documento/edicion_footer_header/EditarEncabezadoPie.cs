@@ -1,13 +1,10 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using funcionalidades_documento.funciones_parrafo;
+using funcionalidades_documento.funciones_tablas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static funcionalidades_documento.crear_documento.FuncionesCreacion;
 
 namespace funcionalidades_documento.edicion_footer_header
 {
@@ -286,7 +283,7 @@ namespace funcionalidades_documento.edicion_footer_header
         /// <param name="texto">Aquí va el texto que se mostrará en todos los pie de página del docuento exceptuando el inicio</param>
         /// <param name="textoPrimeraPagina"></param>
         /// <exception cref="ArgumentNullException">Aquí va el texto que irá en el pie de la primera página del documento</exception>
-        public static void EditarPieDePagina(string ruta, string texto, string textoPrimeraPagina)
+        public static void EditarPieDePagina(string ruta, string texto, List<List<string>> datosTabla)
         {
             ValidarRutaArchivo(ruta);
 
@@ -311,12 +308,19 @@ namespace funcionalidades_documento.edicion_footer_header
                     mainPart.Document.Save();
                 }
 
-                var footer = nuevoPie(texto);
+                var footer = nuevoPie(texto);  // Asegúrate de que esta función pueda trabajar con FooterPart si es necesario.
                 footerPart.Footer = footer;
 
                 // Pie de página para la primera página
                 FooterPart firstPageFooterPart = mainPart.AddNewPart<FooterPart>();
-                var firstPageFooter = nuevoPie(textoPrimeraPagina); // Puedes reemplazar "nuevoPie" con otro método si deseas un diseño diferente
+
+                // Crear la tabla con imágenes para el pie de página de la primera página
+                Table tablaConImagen = PropiedadesTabla.CrearTablaConImagen(firstPageFooterPart, datosTabla);  // Modificado para pasar FooterPart
+
+                // Crea el pie de página para la primera página y añade la tabla directamente a él
+                var firstPageFooter = new Footer();
+                firstPageFooter.Append(tablaConImagen);
+
                 firstPageFooterPart.Footer = firstPageFooter;
                 firstPageFooterPart.Footer.Save();
 
@@ -339,6 +343,5 @@ namespace funcionalidades_documento.edicion_footer_header
                 document.Save();
             }
         }
-
     }
 }
