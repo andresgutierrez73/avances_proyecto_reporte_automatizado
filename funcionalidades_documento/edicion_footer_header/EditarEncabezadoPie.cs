@@ -1,15 +1,10 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using funcionalidades_documento.funciones_imagenes;
-using funcionalidades_documento.funciones_parrafo;
 using funcionalidades_documento.funciones_tablas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static funcionalidades_documento.crear_documento.FuncionesCreacion;
 
 namespace funcionalidades_documento.edicion_footer_header
 {
@@ -313,15 +308,14 @@ namespace funcionalidades_documento.edicion_footer_header
                     mainPart.Document.Save();
                 }
 
-                var footer = nuevoPie(texto);
+                var footer = nuevoPie(texto);  // Asegúrate de que esta función pueda trabajar con FooterPart si es necesario.
                 footerPart.Footer = footer;
 
                 // Pie de página para la primera página
                 FooterPart firstPageFooterPart = mainPart.AddNewPart<FooterPart>();
 
                 // Crear la tabla con imágenes para el pie de página de la primera página
-                Table tablaConImagen = PropiedadesTabla.CrearTablaConImagen(mainPart, datosTabla);
-
+                Table tablaConImagen = PropiedadesTabla.CrearTablaConImagen(firstPageFooterPart, datosTabla);  // Modificado para pasar FooterPart
 
                 // Crea el pie de página para la primera página y añade la tabla directamente a él
                 var firstPageFooter = new Footer();
@@ -349,9 +343,5 @@ namespace funcionalidades_documento.edicion_footer_header
                 document.Save();
             }
         }
-
-
-
-
     }
 }

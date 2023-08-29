@@ -5,8 +5,6 @@ using Word = Microsoft.Office.Interop.Word;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static funcionalidades_documento.crear_documento.FuncionesCreacion;
 using System.Runtime.InteropServices;
 
@@ -422,6 +420,176 @@ namespace funcionalidades_documento.funciones_parrafo
 
             Console.WriteLine("Agregando tabla de contenido al documento.");
         }
+
+        // tabla de tablas
+        public static void TablaTablas(string ruta, string tituloTabla)
+        {
+            ValidarRutaArchivo(ruta);
+
+            using (var document = WordprocessingDocument.Open(ruta, true))
+            {
+                if (document == null)
+                {
+                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
+                }
+
+                var doc = document.MainDocumentPart.Document;
+
+                SdtBlock block = new SdtBlock();
+
+                SdtProperties sdtProperties = new SdtProperties(
+                    new SdtContentDocPartObject(
+                        new DocPartGallery() { Val = "Table of Tables" },
+                        new DocPartUnique())
+                );
+                block.Append(sdtProperties);
+
+                SdtContentBlock sdtContent = new SdtContentBlock();
+
+                // Establecer el título de la "Tabla de Tablas" en negrita y centrado
+                Run tituloRun = new Run(new Text(tituloTabla));
+                RunProperties tituloRunProperties = new RunProperties();
+                tituloRunProperties.Append(new Bold());
+                tituloRunProperties.RunFonts = new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" };  // Fuente Arial
+                tituloRun.PrependChild<RunProperties>(tituloRunProperties);
+
+                ParagraphProperties tituloParaProperties = new ParagraphProperties();
+                tituloParaProperties.Append(new Justification() { Val = JustificationValues.Center });
+                Paragraph Titulo = new Paragraph(tituloRun);
+                Titulo.PrependChild<ParagraphProperties>(tituloParaProperties);
+
+                sdtContent.Append(Titulo);
+
+                Paragraph Contenido = new Paragraph(
+                    new ParagraphProperties(
+                        new RunProperties(
+                            new Bold() { Val = false }, // Establecer explícitamente no-negrita
+                            new NoProof(),
+                            new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" }  // Fuente Arial
+                        )
+                    ),
+                    new Run(
+                        new FieldChar { FieldCharType = FieldCharValues.Begin, Dirty = true }
+                    ),
+                    new Run(
+                        new FieldCode(@"TOC \c ""Tabla"" \h \z \u") { Space = SpaceProcessingModeValues.Preserve }
+                    ),
+                    new Run(
+                        new FieldChar { FieldCharType = FieldCharValues.Separate }
+                    )
+                );
+                sdtContent.Append(Contenido);
+
+                Paragraph ContenEnd = new Paragraph(
+                    new Run(
+                        new RunProperties(
+                            new Bold() { Val = false }, // Establecer explícitamente no-negrita
+                            new NoProof(),
+                            new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" }  // Fuente Arial
+                        ),
+                        new FieldChar { FieldCharType = FieldCharValues.End }
+                    )
+                );
+                sdtContent.Append(ContenEnd);
+
+                block.Append(sdtContent);
+                doc.Body.AppendChild(block);
+
+                var docSettings = document.MainDocumentPart.DocumentSettingsPart;
+                if (docSettings == null)
+                {
+                    docSettings = document.MainDocumentPart.AddNewPart<DocumentSettingsPart>();
+                    docSettings.Settings = new Settings();
+                    docSettings.Settings.Append(new UpdateFieldsOnOpen() { Val = true });
+                }
+            }
+        }
+
+        // tabla de ilustraciones
+        public static void TablaIlustraciones(string ruta, string tituloIlustraciones)
+        {
+            ValidarRutaArchivo(ruta);
+
+            using (var document = WordprocessingDocument.Open(ruta, true))
+            {
+                if (document == null)
+                {
+                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
+                }
+
+                var doc = document.MainDocumentPart.Document;
+
+                SdtBlock block = new SdtBlock();
+
+                SdtProperties sdtProperties = new SdtProperties(
+                    new SdtContentDocPartObject(
+                        new DocPartGallery() { Val = "Table of Figures" },
+                        new DocPartUnique())
+                );
+                block.Append(sdtProperties);
+
+                SdtContentBlock sdtContent = new SdtContentBlock();
+
+                // Establecer el título de la "Tabla de Ilustraciones" en negrita y centrado
+                Run tituloRun = new Run(new Text(tituloIlustraciones));
+                RunProperties tituloRunProperties = new RunProperties();
+                tituloRunProperties.Append(new Bold());
+                tituloRunProperties.RunFonts = new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" };  // Fuente Arial
+                tituloRun.PrependChild<RunProperties>(tituloRunProperties);
+
+                ParagraphProperties tituloParaProperties = new ParagraphProperties();
+                tituloParaProperties.Append(new Justification() { Val = JustificationValues.Center });
+                Paragraph Titulo = new Paragraph(tituloRun);
+                Titulo.PrependChild<ParagraphProperties>(tituloParaProperties);
+
+                sdtContent.Append(Titulo);
+
+                Paragraph Contenido = new Paragraph(
+                    new ParagraphProperties(
+                        new RunProperties(
+                            new Bold() { Val = false },
+                            new NoProof(),
+                            new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" }  // Fuente Arial
+                        )
+                    ),
+                    new Run(
+                        new FieldChar { FieldCharType = FieldCharValues.Begin, Dirty = true }
+                    ),
+                    new Run(
+                        new FieldCode(@"TOC \c ""Ilustracion"" \h \z \u") { Space = SpaceProcessingModeValues.Preserve }
+                    ),
+                    new Run(
+                        new FieldChar { FieldCharType = FieldCharValues.Separate }
+                    )
+                );
+                sdtContent.Append(Contenido);
+
+                Paragraph ContenEnd = new Paragraph(
+                    new Run(
+                        new RunProperties(
+                            new Bold() { Val = false },
+                            new NoProof(),
+                            new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" }  // Fuente Arial
+                        ),
+                        new FieldChar { FieldCharType = FieldCharValues.End }
+                    )
+                );
+                sdtContent.Append(ContenEnd);
+
+                block.Append(sdtContent);
+                doc.Body.AppendChild(block);
+
+                var docSettings = document.MainDocumentPart.DocumentSettingsPart;
+                if (docSettings == null)
+                {
+                    docSettings = document.MainDocumentPart.AddNewPart<DocumentSettingsPart>();
+                    docSettings.Settings = new Settings();
+                    docSettings.Settings.Append(new UpdateFieldsOnOpen() { Val = true });
+                }
+            }
+        }
+
+
 
         /// <summary>
         /// Método para agregar una referencia / cita a un parrafo

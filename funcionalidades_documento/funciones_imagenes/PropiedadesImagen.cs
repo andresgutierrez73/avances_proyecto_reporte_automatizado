@@ -5,13 +5,8 @@ using A = DocumentFormat.OpenXml.Drawing;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using PIC = DocumentFormat.OpenXml.Drawing.Pictures;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static funcionalidades_documento.crear_documento.FuncionesCreacion;
-using System.Security.AccessControl;
 
 namespace funcionalidades_documento.funciones_imagenes
 {
@@ -36,6 +31,40 @@ namespace funcionalidades_documento.funciones_imagenes
             }
         }
 
+        public static Paragraph TituloImagen(string message)
+        {
+            // Crear y establecer las propiedades del párrafo
+            Paragraph paragraph = new Paragraph();
+
+            // Propiedades para centrar el párrafo
+            Justification justification = new Justification() { Val = JustificationValues.Center };
+            ParagraphProperties paragraphProperties = new ParagraphProperties(justification, new ParagraphStyleId() { Val = "IEBNormal2" });
+            ParagraphMarkRunProperties paragraphMarkRunProperties = new ParagraphMarkRunProperties(new Languages() { Val = "es-CO" });
+
+            paragraphProperties.Append(paragraphMarkRunProperties);
+            paragraph.Append(paragraphProperties);
+
+            // Propiedades comunes de Run con negrita añadida
+            RunProperties runProperties = new RunProperties(
+                new Languages() { Val = "es-CO" },
+                new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" },
+                new FontSize() { Val = "24" },  // Tamaño 12 en Word
+                new Bold()  // Negrita
+            );
+
+            // Añadir los runs al párrafo con propiedades únicas
+            paragraph.Append(new Run(runProperties.CloneNode(true), new Text("Ilustración ")));
+            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldChar() { FieldCharType = FieldCharValues.Begin }));
+            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldCode(" SEQ Ilustracion \\* ARABIC ")));
+            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldChar() { FieldCharType = FieldCharValues.Separate }));
+            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldChar() { FieldCharType = FieldCharValues.End }));
+            paragraph.Append(new Run(runProperties.CloneNode(true), new Text(": " + message.Trim())));
+
+            return paragraph;
+        }
+
+
+
         /// <summary>
         /// Método para agregar una imágen a partir de una ruta del escritorio
         /// </summary>
@@ -46,7 +75,7 @@ namespace funcionalidades_documento.funciones_imagenes
         /// <param name="alineacion">Aquí se pasa un enum con un valor el cual determinará la alineación de la imágen dentro
         /// del documento</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void AgregarImagenDesdeArchivo(string rutaDocumento, string rutaImagen, int ancho, int alto, AlineacionImagen alineacion)
+        public static void AgregarImagenDesdeArchivo(string rutaDocumento, string rutaImagen, int ancho, int alto, AlineacionImagen alineacion, string tituloImagen = null)
         {
             // Aquí se multiplican los valores por esta cantidad, para hacer la convesión de EMU a cm
             ancho *= 360000;
@@ -98,7 +127,7 @@ namespace funcionalidades_documento.funciones_imagenes
                     )
                     { DistanceFromTop = (UInt32Value)0U, DistanceFromBottom = (UInt32Value)0U, DistanceFromLeft = (UInt32Value)0U, DistanceFromRight = (UInt32Value)0U, EditId = "50D07946" });
 
-                // Creamos la variable aling la cual va a cambiar dependiendo de los valores que se pasen por parametro en el enum
+                // Creamos la variable align la cual va a cambiar dependiendo de los valores que se pasen por parametro en el enum
                 string align = "";
 
                 // Usamos la estructura de control switch para modificar la variable anterior
@@ -126,11 +155,24 @@ namespace funcionalidades_documento.funciones_imagenes
                 }
                 paragraph.ParagraphProperties = new ParagraphProperties(new Justification() { Val = jv });
                 document.MainDocumentPart.Document.Body.AppendChild(paragraph);
+
+                // Después de agregar la imagen, añade el título si es proporcionado
+                if (!string.IsNullOrEmpty(tituloImagen))
+                {
+                    Paragraph caption = TituloImagen(tituloImagen);
+                    document.MainDocumentPart.Document.Body.AppendChild(caption);
+                }
+
                 document.MainDocumentPart.Document.Save();
             }
 
             Console.WriteLine($"Imagen {rutaImagen} añadida al documento {rutaDocumento}");
         }
+
+
+
+
+
 
         /// <summary>
         /// Método para insertar una imágen decodificada en base64, este método inserta directamente la imágen dentro del
@@ -243,7 +285,7 @@ namespace funcionalidades_documento.funciones_imagenes
         /// <param name="alineacion">Aquí se pasa un enum con un valor el cual determinará la alineación de la imágen dentro
         /// del documento</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static Drawing ObtenerImagenDesdeBase64(MainDocumentPart mainPart, string imagenBase64, int ancho, int alto, AlineacionImagen alineacion)
+        public static Drawing ObtenerImagenDesdeBase64(MainDocumentPart mainPart, string imagenBase64, int ancho, int alto)
         {
             // Conversión de dimensiones de centímetros a EMU.
             ancho *= 360000;
@@ -259,6 +301,70 @@ namespace funcionalidades_documento.funciones_imagenes
             }
 
             string relationshipId = mainPart.GetIdOfPart(imagePart);
+
+            var element = new Drawing(
+                new DW.Inline(
+                    new DW.Extent() { Cx = ancho, Cy = alto },
+                    new DW.EffectExtent() { LeftEdge = 0L, TopEdge = 0L, RightEdge = 0L, BottomEdge = 0L },
+                    new DW.DocProperties() { Id = (UInt32Value)1U, Name = "Picture 1" },
+                    new DW.NonVisualGraphicFrameDrawingProperties(new A.GraphicFrameLocks() { NoChangeAspect = true }),
+                    new A.Graphic(
+                        new A.GraphicData(
+                            new PIC.Picture(
+                                new PIC.NonVisualPictureProperties(
+                                    new PIC.NonVisualDrawingProperties() { Id = (UInt32Value)0U, Name = "New Bitmap Image.jpg" },
+                                    new PIC.NonVisualPictureDrawingProperties()),
+                                new PIC.BlipFill(
+                                    new A.Blip(
+                                        new A.BlipExtensionList(
+                                            new A.BlipExtension() { Uri = "{28A0092B-C50C-407E-A947-70E740481C1C}" })
+                                    )
+                                    { Embed = relationshipId, CompressionState = A.BlipCompressionValues.Print },
+                                    new A.Stretch(new A.FillRectangle())),
+                                new PIC.ShapeProperties(
+                                    new A.Transform2D(new A.Offset() { X = 0L, Y = 0L }, new A.Extents() { Cx = ancho, Cy = alto }),
+                                    new A.PresetGeometry(new A.AdjustValueList()) { Preset = A.ShapeTypeValues.Rectangle }))
+                        )
+                        { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" })
+                )
+            );
+
+            return element;
+        }
+
+        public static Drawing ObtenerImagenDesdeBase64(OpenXmlPart part, string imagenBase64, int ancho, int alto)
+        {
+            // Conversión de dimensiones de centímetros a EMU.
+            ancho *= 360000;
+            alto *= 360000;
+
+            ImagePart imagePart;
+
+            if (part is MainDocumentPart mainPart)
+            {
+                imagePart = mainPart.AddImagePart(ImagePartType.Jpeg);
+            }
+            else if (part is HeaderPart headerPart)
+            {
+                imagePart = headerPart.AddImagePart(ImagePartType.Jpeg);
+            }
+            else if (part is FooterPart footerPart)
+            {
+                imagePart = footerPart.AddImagePart(ImagePartType.Jpeg);
+            }
+            else
+            {
+                throw new ArgumentException("Tipo de parte no compatible", nameof(part));
+            }
+
+            byte[] imageBytes = Convert.FromBase64String(imagenBase64);
+
+            using (MemoryStream stream = new MemoryStream(imageBytes))
+            {
+                imagePart.FeedData(stream);
+            }
+
+            string relationshipId = part.GetIdOfPart(imagePart);
 
             var element = new Drawing(
                 new DW.Inline(

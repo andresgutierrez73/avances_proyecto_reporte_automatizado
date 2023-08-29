@@ -88,18 +88,21 @@ namespace funcionalidades_documento.componentes_reporte
                 };
 
                 // Llamado a los métodos para añadir el contenido al documento
-                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
-                PropiedadesParrafo.AgregarParrafo(ruta, tituloPortada.ToUpper(), 20, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Centro);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 2);
+                PropiedadesParrafo.AgregarParrafo(ruta, tituloPortada.ToUpper(), 20, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Centro);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 3);
                 PropiedadesParrafo.AgregarParrafo(ruta, tituloPortada2.ToUpper(), 20, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Centro);
-                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 2);
                 PropiedadesParrafo.AgregarParrafo(ruta, tituloPortada3.ToUpper(), 20, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Centro);
-                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos);
+                PropiedadesParrafo.AgregarSaltoDePagina(ruta);
                 EditarEncabezadoPie.EditarEncabezado(ruta, encabezadoAlto, encabezadoBajo, 2);
                 EditarEncabezadoPie.EditarPieDePagina(ruta, pie, datos3);
+                PropiedadesParrafo.TablaContenido(ruta, "tabla de contenido".ToUpper());
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
-                PropiedadesParrafo.TablaContenido(ruta, "TABLA DE CONTENDIO");
+                PropiedadesParrafo.TablaTablas(ruta, "lista de tablas".ToUpper());
+                PropiedadesParrafo.TablaIlustraciones(ruta, "tabla de ilustraciones".ToUpper());
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
             }
             catch (Exception ex)
@@ -117,7 +120,6 @@ namespace funcionalidades_documento.componentes_reporte
             {
                 //Llamado a los métodos que tienen el contenido del documento
                 SeccionesCuerpoReporte.Objeto(ruta);
-                SeccionesCuerpoReporte.TablaEjemplo(ruta);
                 SeccionesCuerpoReporte.Alcance(ruta);
                 SeccionesCuerpoReporte.DescripcionPorticos(ruta);
                 SeccionesCuerpoReporte.EspecificacionMateriales(ruta);
