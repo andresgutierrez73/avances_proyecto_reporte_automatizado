@@ -7,6 +7,7 @@ using PIC = DocumentFormat.OpenXml.Drawing.Pictures;
 using System;
 using System.IO;
 using static funcionalidades_documento.crear_documento.FuncionesCreacion;
+using System.Linq;
 
 namespace funcionalidades_documento.funciones_imagenes
 {
@@ -31,7 +32,12 @@ namespace funcionalidades_documento.funciones_imagenes
             }
         }
 
-        public static Paragraph TituloImagen(string message)
+        /// <summary>
+        /// Método para generar el título con contador para las imágenes
+        /// </summary>
+        /// <param name="mensaje">Aquí se pasa el título que va a ir ubicado encima de la imagen que se agrega al contenido</param>
+        /// <returns>Retorna el párrafo con estilo para que pueda ser insertado en el documento</returns>
+        public static Paragraph TituloImagen(string mensaje)
         {
             // Crear y establecer las propiedades del párrafo
             Paragraph paragraph = new Paragraph();
@@ -53,17 +59,20 @@ namespace funcionalidades_documento.funciones_imagenes
             );
 
             // Añadir los runs al párrafo con propiedades únicas
-            paragraph.Append(new Run(runProperties.CloneNode(true), new Text("Ilustración ")));
-            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldChar() { FieldCharType = FieldCharValues.Begin }));
-            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldCode(" SEQ Ilustracion \\* ARABIC ")));
-            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldChar() { FieldCharType = FieldCharValues.Separate }));
-            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldChar() { FieldCharType = FieldCharValues.End }));
-            paragraph.Append(new Run(runProperties.CloneNode(true), new Text(": " + message.Trim())));
+            paragraph.Append(new Run(runProperties.CloneNode(true), new Text("Imagen ")));
+
+            Run seqRun = new Run(runProperties.CloneNode(true));
+            seqRun.Append(new FieldChar() { FieldCharType = FieldCharValues.Begin });
+            seqRun.Append(new FieldCode(" SEQ Imagen \\* ARABIC ") { Space = SpaceProcessingModeValues.Preserve });
+            seqRun.Append(new FieldChar() { FieldCharType = FieldCharValues.Separate });
+            seqRun.Append(new Text("0"));  // Puedes dejarlo así, Word lo actualizará cuando se actualicen los campos.
+            seqRun.Append(new FieldChar() { FieldCharType = FieldCharValues.End });
+
+            paragraph.Append(seqRun);
+            paragraph.Append(new Run(runProperties.CloneNode(true), new Text(": " + mensaje.Trim())));
 
             return paragraph;
         }
-
-
 
         /// <summary>
         /// Método para agregar una imágen a partir de una ruta del escritorio
@@ -77,7 +86,7 @@ namespace funcionalidades_documento.funciones_imagenes
         /// <exception cref="ArgumentNullException"></exception>
         public static void AgregarImagenDesdeArchivo(string rutaDocumento, string rutaImagen, int ancho, int alto, AlineacionImagen alineacion, string tituloImagen = null)
         {
-            // Aquí se multiplican los valores por esta cantidad, para hacer la convesión de EMU a cm
+            // Aquí se multiplican los valores por esta cantidad, para hacer la conversión de EMU a cm
             ancho *= 360000;
             alto *= 360000;
 
@@ -100,11 +109,19 @@ namespace funcionalidades_documento.funciones_imagenes
 
                 string relationshipId = mainPart.GetIdOfPart(imagePart);
 
+                // Obtiene el último Id utilizado para imágenes en el documento
+                UInt32Value lastId = 1U;
+                if (document.MainDocumentPart.Document.Descendants<DW.DocProperties>().Any())
+                {
+                    lastId = document.MainDocumentPart.Document.Descendants<DW.DocProperties>().Max(p => p.Id.Value);
+                    lastId++;
+                }
+
                 var element = new Drawing(
                     new DW.Inline(
                         new DW.Extent() { Cx = ancho, Cy = alto },
                         new DW.EffectExtent() { LeftEdge = 0L, TopEdge = 0L, RightEdge = 0L, BottomEdge = 0L },
-                        new DW.DocProperties() { Id = (UInt32Value)1U, Name = "Picture 1" },
+                        new DW.DocProperties() { Id = lastId, Name = "Picture " + lastId },
                         new DW.NonVisualGraphicFrameDrawingProperties(new A.GraphicFrameLocks() { NoChangeAspect = true }),
                         new A.Graphic(
                             new A.GraphicData(
@@ -168,11 +185,6 @@ namespace funcionalidades_documento.funciones_imagenes
 
             Console.WriteLine($"Imagen {rutaImagen} añadida al documento {rutaDocumento}");
         }
-
-
-
-
-
 
         /// <summary>
         /// Método para insertar una imágen decodificada en base64, este método inserta directamente la imágen dentro del

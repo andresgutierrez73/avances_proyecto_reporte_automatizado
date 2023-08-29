@@ -564,6 +564,7 @@ namespace funcionalidades_documento.componentes_reporte
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, 1, true);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaSalidaImagen, 11, 5, FuncionesCreacion.AlineacionImagen.Centro, "dmff");
+                PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaSalidaImagen, 11, 5, FuncionesCreacion.AlineacionImagen.Centro, "dmfeeef");
                 //PropiedadesImagen.AgregarImagenDesdeBase64(ruta, base64Imagen, 5, 5, FuncionesCreacion.AlineacionImagen.Centro);
 
             }

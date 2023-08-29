@@ -102,6 +102,7 @@ namespace funcionalidades_documento.componentes_reporte
                 PropiedadesParrafo.TablaContenido(ruta, "tabla de contenido".ToUpper());
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
                 PropiedadesParrafo.TablaTablas(ruta, "lista de tablas".ToUpper());
+                PropiedadesParrafo.AgregarSaltoDePagina(ruta);
                 PropiedadesParrafo.TablaIlustraciones(ruta, "tabla de ilustraciones".ToUpper());
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
             }
