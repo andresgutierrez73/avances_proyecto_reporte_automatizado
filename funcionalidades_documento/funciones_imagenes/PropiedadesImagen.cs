@@ -39,40 +39,33 @@ namespace funcionalidades_documento.funciones_imagenes
         /// <returns>Retorna el párrafo con estilo para que pueda ser insertado en el documento</returns>
         public static Paragraph TituloImagen(string mensaje)
         {
-            // Crear y establecer las propiedades del párrafo
             Paragraph paragraph = new Paragraph();
 
-            // Propiedades para centrar el párrafo
             Justification justification = new Justification() { Val = JustificationValues.Center };
-            ParagraphProperties paragraphProperties = new ParagraphProperties(justification, new ParagraphStyleId() { Val = "IEBNormal2" });
+            ParagraphProperties paragraphProperties = new ParagraphProperties(justification);
             ParagraphMarkRunProperties paragraphMarkRunProperties = new ParagraphMarkRunProperties(new Languages() { Val = "es-CO" });
 
             paragraphProperties.Append(paragraphMarkRunProperties);
             paragraph.Append(paragraphProperties);
 
-            // Propiedades comunes de Run con negrita añadida
             RunProperties runProperties = new RunProperties(
                 new Languages() { Val = "es-CO" },
                 new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" },
-                new FontSize() { Val = "24" },  // Tamaño 12 en Word
-                new Bold()  // Negrita
+                new FontSize() { Val = "24" },
+                new Bold()
             );
 
-            // Añadir los runs al párrafo con propiedades únicas
-            paragraph.Append(new Run(runProperties.CloneNode(true), new Text("Imagen ")));
-
-            Run seqRun = new Run(runProperties.CloneNode(true));
-            seqRun.Append(new FieldChar() { FieldCharType = FieldCharValues.Begin });
-            seqRun.Append(new FieldCode(" SEQ Imagen \\* ARABIC ") { Space = SpaceProcessingModeValues.Preserve });
-            seqRun.Append(new FieldChar() { FieldCharType = FieldCharValues.Separate });
-            seqRun.Append(new Text("0"));  // Puedes dejarlo así, Word lo actualizará cuando se actualicen los campos.
-            seqRun.Append(new FieldChar() { FieldCharType = FieldCharValues.End });
-
-            paragraph.Append(seqRun);
+            paragraph.Append(new Run(runProperties.CloneNode(true), new Text("Ilustración ")));
+            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldChar() { FieldCharType = FieldCharValues.Begin }));
+            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldCode(" SEQ Ilustración \\* ARABIC ")));
+            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldChar() { FieldCharType = FieldCharValues.Separate }));
+            paragraph.Append(new Run(runProperties.CloneNode(true), new Text(" "))); // Esto generará el número de secuencia.
+            paragraph.Append(new Run(runProperties.CloneNode(true), new FieldChar() { FieldCharType = FieldCharValues.End }));
             paragraph.Append(new Run(runProperties.CloneNode(true), new Text(": " + mensaje.Trim())));
 
             return paragraph;
         }
+
 
         /// <summary>
         /// Método para agregar una imágen a partir de una ruta del escritorio
@@ -197,9 +190,9 @@ namespace funcionalidades_documento.funciones_imagenes
         /// <param name="alineacion">Aquí se pasa un enum con un valor el cual determinará la alineación de la imágen dentro
         /// del documento</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void AgregarImagenDesdeBase64(string rutaDocumento, string imagenBase64, int ancho, int alto, AlineacionImagen alineacion)
+        public static void AgregarImagenDesdeBase64(string rutaDocumento, string imagenBase64, int ancho, int alto, AlineacionImagen alineacion, string tituloImagen = null)
         {
-            // Aquí se multiplican los valores por esta cantidad, para hacer la convesión de EMU a cm
+            // Aquí se multiplican los valores por esta cantidad, para hacer la conversión de EMU a cm
             ancho *= 360000;
             alto *= 360000;
 
@@ -251,7 +244,7 @@ namespace funcionalidades_documento.funciones_imagenes
                     )
                     { DistanceFromTop = (UInt32Value)0U, DistanceFromBottom = (UInt32Value)0U, DistanceFromLeft = (UInt32Value)0U, DistanceFromRight = (UInt32Value)0U, EditId = "50D07946" });
 
-                // Creamos la variable aling la cual va a cambiar dependiendo de los valores que se pasen por parametro en el enum
+                // Creamos la variable align la cual va a cambiar dependiendo de los valores que se pasen por parámetro en el enum
                 string align = "";
 
                 // Usamos la estructura de control switch para modificar la variable anterior
@@ -267,7 +260,7 @@ namespace funcionalidades_documento.funciones_imagenes
                         align = "Center";
                         break;
                     default:
-                        align = "Left";
+                        align = "Center";
                         break;
                 }
 
@@ -278,12 +271,24 @@ namespace funcionalidades_documento.funciones_imagenes
                     jv = JustificationValues.Left;
                 }
                 paragraph.ParagraphProperties = new ParagraphProperties(new Justification() { Val = jv });
+
+                // Primero añadimos la imagen al cuerpo del documento.
                 document.MainDocumentPart.Document.Body.AppendChild(paragraph);
+
+                // Luego, si se proporcionó un título para la imagen, se añade después de la imagen.
+                if (!string.IsNullOrEmpty(tituloImagen))
+                {
+                    Paragraph caption = TituloImagen(tituloImagen);
+                    document.MainDocumentPart.Document.Body.AppendChild(caption);
+                }
+
                 document.MainDocumentPart.Document.Save();
             }
 
-            Console.WriteLine($"Imagen añadida al documento {rutaDocumento}");
+            Console.WriteLine($"Imagen añadida al documento {rutaDocumento}. Título: \"{tituloImagen ?? "Sin título"}\"");
         }
+
+
 
         /// <summary>
         /// Método para insertar una imágen decodificada en base64, este método necesita una mayor manupulación ya que no inserta
@@ -344,6 +349,17 @@ namespace funcionalidades_documento.funciones_imagenes
             return element;
         }
 
+        /// <summary>
+        /// Método sobreconstruido para solucionar solucionar el problema de agregar las imagenes solo al cuerpo del documento
+        /// con este se puede insertar tanto en el documento como en el encabezado y pie de pagina
+        /// </summary>
+        /// <param name="part">Aquí se pasa la parte principal del documento, ya sea dle cuerpo, cabecera o pie de pagina para retornar las imagen</param>
+        /// <param name="imagenBase64">Aquí se pasa un string que tenga toda la cadena de caracteres en base64 de la imágen</param>
+        /// <param name="ancho">Aquí se pasa la longitud en cm del ancho de la imágen del documento</param>
+        /// <param name="alto">Aquí se pasa la longitud en cm del alto de la imágen del documento</param>
+        /// <returns>Retorna un tipo de objeto de la libreria que permite instar una imagen para que puede ser usada por
+        /// otro método que inserte la información directamente en el documento</returns>
+        /// <exception cref="ArgumentException"></exception>
         public static Drawing ObtenerImagenDesdeBase64(OpenXmlPart part, string imagenBase64, int ancho, int alto)
         {
             // Conversión de dimensiones de centímetros a EMU.

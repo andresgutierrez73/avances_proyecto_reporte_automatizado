@@ -516,7 +516,7 @@ namespace funcionalidades_documento.funciones_parrafo
         /// <param name="ruta">Aquí va la ruta del documento de word</param>
         /// <param name="tituloIlustraciones"></param>
         /// <exception cref="ArgumentNullException">Aquí va el título que va a tener la tabla de contenido</exception>
-        public static void TablaIlustraciones(string ruta, string tituloIlustraciones)
+        public static void TablaIlustraciones(string ruta, string tituloTabla)
         {
             ValidarRutaArchivo(ruta);
 
@@ -540,11 +540,10 @@ namespace funcionalidades_documento.funciones_parrafo
 
                 SdtContentBlock sdtContent = new SdtContentBlock();
 
-                // Establecer el título de la "Tabla de Ilustraciones" en negrita y centrado
-                Run tituloRun = new Run(new Text(tituloIlustraciones));
+                Run tituloRun = new Run(new Text(tituloTabla));
                 RunProperties tituloRunProperties = new RunProperties();
                 tituloRunProperties.Append(new Bold());
-                tituloRunProperties.RunFonts = new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" };  // Fuente Arial
+                tituloRunProperties.RunFonts = new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" };
                 tituloRun.PrependChild<RunProperties>(tituloRunProperties);
 
                 ParagraphProperties tituloParaProperties = new ParagraphProperties();
@@ -554,15 +553,24 @@ namespace funcionalidades_documento.funciones_parrafo
 
                 sdtContent.Append(Titulo);
 
-                // Creando el código para la tabla de contenido
-                Run tocRun = new Run();
-                tocRun.Append(new FieldChar() { FieldCharType = FieldCharValues.Begin });
-                tocRun.Append(new FieldCode(@"TOC \c ""Imagen"" \h \z \u") { Space = SpaceProcessingModeValues.Preserve });
-                tocRun.Append(new FieldChar() { FieldCharType = FieldCharValues.Separate });
-                tocRun.Append(new Text("Table of Illustrations placeholder..."));  // Este es solo un marcador de posición. Word debería actualizarlo.
-                tocRun.Append(new FieldChar() { FieldCharType = FieldCharValues.End });
-
-                Paragraph Contenido = new Paragraph(tocRun);
+                Paragraph Contenido = new Paragraph(
+                    new ParagraphProperties(
+                        new RunProperties(
+                            new Bold() { Val = false },
+                            new NoProof(),
+                            new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" }
+                        )
+                    ),
+                    new Run(
+                        new FieldChar { FieldCharType = FieldCharValues.Begin, Dirty = true }
+                    ),
+                    new Run(
+                        new FieldCode(@"TOC \c ""Ilustración"" \h \z \u") { Space = SpaceProcessingModeValues.Preserve }
+                    ),
+                    new Run(
+                        new FieldChar { FieldCharType = FieldCharValues.Separate }
+                    )
+                );
                 sdtContent.Append(Contenido);
 
                 Paragraph ContenEnd = new Paragraph(
@@ -570,7 +578,7 @@ namespace funcionalidades_documento.funciones_parrafo
                         new RunProperties(
                             new Bold() { Val = false },
                             new NoProof(),
-                            new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" }  // Fuente Arial
+                            new RunFonts() { Ascii = "Arial", HighAnsi = "Arial" }
                         ),
                         new FieldChar { FieldCharType = FieldCharValues.End }
                     )
@@ -589,6 +597,9 @@ namespace funcionalidades_documento.funciones_parrafo
                 }
             }
         }
+
+
+
 
         /// <summary>
         /// Método para agregar una referencia / cita a un parrafo
