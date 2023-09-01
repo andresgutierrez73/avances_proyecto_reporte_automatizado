@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml;
 using System;
 using System.IO;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Word = Microsoft.Office.Interop.Word;
 
 namespace funcionalidades_documento.crear_documento
 {
@@ -113,6 +114,50 @@ namespace funcionalidades_documento.crear_documento
                 mainPart.Document.Body.Append(sectionProps);
 
                 mainPart.Document.Save();
+            }
+        }
+
+        public static void ActualizarCamposEnWord(string rutaArchivo)
+        {
+            // Crear una nueva aplicación Word
+            Word.Application wordApp = new Word.Application();
+            Word.Document doc = null;
+
+            try
+            {
+                // Abrir el documento
+                doc = wordApp.Documents.Open(rutaArchivo);
+
+                // Actualizar la Tabla de Tablas
+                foreach (Word.TableOfContents toc in doc.TablesOfContents)
+                {
+                    toc.Update();
+                }
+
+                // Actualizar la Tabla de Ilustraciones
+                foreach (Word.TableOfFigures tof in doc.TablesOfFigures)
+                {
+                    tof.Update();
+                }
+
+                // Seleccionar todo el contenido del documento
+                Word.Range range = doc.Content;
+
+                // Actualizar todos los campos en el rango seleccionado
+                range.Fields.Update();
+
+                // Guardar y cerrar el documento
+                doc.Save();
+                doc.Close();
+            }
+            finally
+            {
+                // Cerrar Word
+                if (doc != null)
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(doc);
+
+                wordApp.Quit();
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(wordApp);
             }
         }
 

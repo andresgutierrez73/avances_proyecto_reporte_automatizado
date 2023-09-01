@@ -66,7 +66,6 @@ namespace funcionalidades_documento.funciones_imagenes
             return paragraph;
         }
 
-
         /// <summary>
         /// Método para agregar una imágen a partir de una ruta del escritorio
         /// </summary>
@@ -287,8 +286,6 @@ namespace funcionalidades_documento.funciones_imagenes
 
             Console.WriteLine($"Imagen añadida al documento {rutaDocumento}. Título: \"{tituloImagen ?? "Sin título"}\"");
         }
-
-
 
         /// <summary>
         /// Método para insertar una imágen decodificada en base64, este método necesita una mayor manupulación ya que no inserta

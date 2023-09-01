@@ -510,6 +510,8 @@ namespace funcionalidades_documento.funciones_parrafo
             }
         }
 
+
+
         /// <summary>
         /// Método para crear una tabla de contenido en la cual se hace referencia a los titulos de las imagenes (leyenda)
         /// </summary>
@@ -540,6 +542,7 @@ namespace funcionalidades_documento.funciones_parrafo
 
                 SdtContentBlock sdtContent = new SdtContentBlock();
 
+                // Establecer el título de la "Tabla de Ilustraciones" en negrita y centrado
                 Run tituloRun = new Run(new Text(tituloTabla));
                 RunProperties tituloRunProperties = new RunProperties();
                 tituloRunProperties.Append(new Bold());
@@ -597,6 +600,9 @@ namespace funcionalidades_documento.funciones_parrafo
                 }
             }
         }
+
+
+
 
 
 
