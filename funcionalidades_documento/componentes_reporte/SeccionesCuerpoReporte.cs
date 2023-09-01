@@ -568,8 +568,13 @@ namespace funcionalidades_documento.componentes_reporte
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 //PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaSalidaImagen, 11, 5, FuncionesCreacion.AlineacionImagen.Centro, "dmff");
                 //PropiedadesImagen.AgregarImagenDesdeArchivo(ruta, rutaSalidaImagen, 11, 5, FuncionesCreacion.AlineacionImagen.Centro, "dmfeeef");
-                PropiedadesImagen.AgregarImagenDesdeBase64(ruta, base64Imagen, 5, 5, FuncionesCreacion.AlineacionImagen.Centro, "hola");
-                PropiedadesImagen.AgregarImagenDesdeBase64(ruta, base64Imagen, 5, 5, FuncionesCreacion.AlineacionImagen.Centro, "hola");
+
+                for (int i = 0; i < 5; i++)
+                {
+                    PropiedadesImagen.AgregarImagenDesdeBase64(ruta, base64Imagen, 5, 5, FuncionesCreacion.AlineacionImagen.Centro, $"hola {i}");
+                    PropiedadesImagen.AgregarImagenDesdeBase64(ruta, base64Imagen, 5, 5, FuncionesCreacion.AlineacionImagen.Centro, $"hola {i++}");
+                }
+                
 
             }
             catch (Exception ex)

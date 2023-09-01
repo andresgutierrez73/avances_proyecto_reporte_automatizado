@@ -134,6 +134,7 @@ namespace funcionalidades_documento.componentes_reporte
                 SeccionesCuerpoReporte.CargasMontajeMantenimiento(ruta);
                 SeccionesCuerpoReporte.CombinacionesCarga(ruta);
                 SeccionesCuerpoReporte.NomenclaturaReporte(ruta);
+                FuncionesCreacion.ActualizarCamposEnWord(ruta);
             }
             catch (Exception ex)
             {
