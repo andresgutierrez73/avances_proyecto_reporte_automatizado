@@ -147,7 +147,7 @@ namespace funcionalidades_documento.funciones_tablas
                         {
                             cellProperties.Append(new DocumentFormat.OpenXml.Wordprocessing.Shading() { Val = ShadingPatternValues.Clear, Fill = "f0f0f0" });
                             paragraph.ParagraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties(new Justification() { Val = JustificationValues.Center });
-                            run.RunProperties.Append(new Bold());  // Aquí es donde se añade la propiedad de negrita
+                            run.RunProperties.Append(new Bold());
                         }
 
                         run.Append(new DocumentFormat.OpenXml.Wordprocessing.Text(cellText));
@@ -178,8 +178,13 @@ namespace funcionalidades_documento.funciones_tablas
 
                         cellProperties.Append(new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center });
                         cell.Append(cellProperties);
-
                         row.Append(cell);
+                    }
+
+                    // Aquí es donde agregas la propiedad TableHeader a las filas que actuarán como encabezados.
+                    if (filasConFondo > 0 && rowIndex < filasConFondo)
+                    {
+                        row.Append(new TableHeader());
                     }
 
                     table.Append(row);
@@ -313,6 +318,12 @@ namespace funcionalidades_documento.funciones_tablas
                         cell.Append(cellProperties);
 
                         row.Append(cell);
+                    }
+
+                    // Aquí es donde agregas la propiedad TableHeader a las filas que actuarán como encabezados.
+                    if (filasConFondo > 0 && rowIndex < filasConFondo)
+                    {
+                        row.Append(new TableHeader());
                     }
 
                     table.Append(row);

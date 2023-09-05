@@ -510,8 +510,6 @@ namespace funcionalidades_documento.funciones_parrafo
             }
         }
 
-
-
         /// <summary>
         /// Método para crear una tabla de contenido en la cual se hace referencia a los titulos de las imagenes (leyenda)
         /// </summary>
@@ -601,12 +599,6 @@ namespace funcionalidades_documento.funciones_parrafo
             }
         }
 
-
-
-
-
-
-
         /// <summary>
         /// Método para agregar una referencia / cita a un parrafo
         /// </summary>
@@ -624,6 +616,7 @@ namespace funcionalidades_documento.funciones_parrafo
         {
             tamanoFuente *= 2;
 
+            // Suponiendo que tienes un método ValidarRutaArchivo que verifica la ruta del archivo
             ValidarRutaArchivo(ruta);
 
             // Primero, abre el documento con OpenXML y agrega el párrafo
@@ -660,7 +653,7 @@ namespace funcionalidades_documento.funciones_parrafo
                 var paragraph = new Paragraph(run);
 
                 // Evitar salto de línea después del párrafo
-                var spacing = new SpacingBetweenLines() { After = "0" };
+                var spacing = new SpacingBetweenLines() { Before = "0", After = "0" };
                 var paragraphProps = new ParagraphProperties(spacing);
 
                 // Aplicar la alineación correspondiente
@@ -684,7 +677,6 @@ namespace funcionalidades_documento.funciones_parrafo
                 }
 
                 paragraph.PrependChild(paragraphProps);
-
                 body.AppendChild(paragraph);
                 document.MainDocumentPart.Document.Save();
             }
@@ -700,29 +692,41 @@ namespace funcionalidades_documento.funciones_parrafo
             Word.Range citationRange = docInterop.Content;
             citationRange.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
 
+            // Verificar si la cita ya existe
+            bool sourceExists = false;
+            foreach (Word.Source source in docInterop.Bibliography.Sources)
+            {
+                if (source.Tag == nombreCita)
+                {
+                    sourceExists = true;
+                    break;
+                }
+            }
 
-            // Agregar la fuente bibliográfica
-            string tag = nombreCita;
-            string sourceXML = $@"<b:Source xmlns:b=""http://schemas.openxmlformats.org/officeDocument/2006/bibliography"">
-                    <b:Tag>{tag}</b:Tag>
-                    <b:SourceType>Book</b:SourceType>
-                    <b:Author>
+            // Si la fuente bibliográfica no existe, agrégala
+            if (!sourceExists)
+            {
+                string sourceXML = $@"<b:Source xmlns:b=""http://schemas.openxmlformats.org/officeDocument/2006/bibliography"">
+                        <b:Tag>{nombreCita}</b:Tag>
+                        <b:SourceType>Book</b:SourceType>
                         <b:Author>
-                            <b:NameList>
-                                <b:Person>
-                                    <b:Last>{apellidoAutor}</b:Last>
-                                    <b:First>{nombreAutor}</b:First>
-                                </b:Person>
-                            </b:NameList>
+                            <b:Author>
+                                <b:NameList>
+                                    <b:Person>
+                                        <b:Last>{apellidoAutor}</b:Last>
+                                        <b:First>{nombreAutor}</b:First>
+                                    </b:Person>
+                                </b:NameList>
+                            </b:Author>
                         </b:Author>
-                    </b:Author>
-                    <b:Title>{tituloLibro}</b:Title>
-                    <b:Year>{año}</b:Year>
-                </b:Source>";
-            docInterop.Bibliography.Sources.Add(sourceXML);
+                        <b:Title>{tituloLibro}</b:Title>
+                        <b:Year>{año}</b:Year>
+                    </b:Source>";
+                docInterop.Bibliography.Sources.Add(sourceXML);
+            }
 
-            // Insertar la cita
-            citationRange.Fields.Add(citationRange, Word.WdFieldType.wdFieldCitation, tag, true);
+            // Insertar la cita (ya sea que la fuente bibliográfica se haya agregado en este método o previamente)
+            citationRange.Fields.Add(citationRange, Word.WdFieldType.wdFieldCitation, nombreCita, true);
 
             docInterop.Save();
             docInterop.Close();
