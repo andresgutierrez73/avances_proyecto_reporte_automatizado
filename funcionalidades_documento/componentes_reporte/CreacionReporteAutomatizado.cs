@@ -5,25 +5,28 @@ using funcionalidades_documento.funciones_tablas;
 using funcionalidades_documento.edicion_footer_header;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Policy;
 
 namespace funcionalidades_documento.componentes_reporte
 {
     public class CreacionReporteAutomatizado
     {
-        // Esta es la propiedad que se va a reutilizar en toda la clase con la ubicación del documento
+        /// <summary>
+        /// Esta es la propiedad que se va a reutilizar en toda la clase con la ubicación del documento
+        /// </summary>
         public string Ruta { get; set; }
 
-        // Este es el constructor de la clase que asigna la ruta apenas es instanciado
+        /// <summary>
+        /// Este es el constructor de la clase que asigna la ruta apenas es instanciado
+        /// </summary>
+        /// <param name="ruta">Aquí va la ruta del documento de word que se va crear y modificar</param>
         public CreacionReporteAutomatizado(string ruta)
         {
             this.Ruta = ruta;
         }
 
-        // Este es el método que crea y pasa el archivo de word al inicializador del proyecto
+        /// <summary>
+        /// Este es el método que crea y pasa el archivo de word al inicializador del proyecto
+        /// </summary>
         public void GeneradorDocumento()
         {
             // Controlamos las excepciones del programa
@@ -42,7 +45,10 @@ namespace funcionalidades_documento.componentes_reporte
             }
         }
 
-        // Este es el método encargado de generar la portada del documento
+        /// <summary>
+        /// Este es el método encargado de generar la portada del documento
+        /// </summary>
+        /// <param name="ruta">Aquí va la ruta del documento de word</param>
         public void CreacionPortada(string ruta)
         {
             // Controlamos las excepciones del programa
@@ -113,7 +119,10 @@ namespace funcionalidades_documento.componentes_reporte
             }
         }
 
-        // Este es el método encargado de hacer el cuerpo del informe
+        /// <summary>
+        /// Este es el método encargado de hacer el cuerpo del informe
+        /// </summary>
+        /// <param name="ruta">Aquí va la ruta del documento de word</param>
         public void CreacionCuerpoInforme(string ruta)
         {
             // Controlamos las excepciones del programa
@@ -135,6 +144,10 @@ namespace funcionalidades_documento.componentes_reporte
                 SeccionesCuerpoReporte.CombinacionesCarga(ruta);
                 SeccionesCuerpoReporte.NomenclaturaReporte(ruta);
                 FuncionesCreacion.ActualizarCamposEnWord(ruta);
+                PropiedadesParrafo.AgregarSaltoDePagina(ruta);
+                PropiedadesParrafo.AgregarTitulo(ruta, "referencias".ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
+                PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                PropiedadesParrafo.InsertarBibliografia(ruta);
             }
             catch (Exception ex)
             {

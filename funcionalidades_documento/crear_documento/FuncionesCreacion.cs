@@ -117,6 +117,56 @@ namespace funcionalidades_documento.crear_documento
             }
         }
 
+        /// <summary>
+        /// Método para cambiar la orientacion de una pagina determinada en un docmento de word,
+        /// antes de cambiar la orientacion es mejor usar antes un salto de pagina,
+        /// para que de esta forma no se cambie paginas las cuales no se necesitan
+        /// </summary>
+        /// <param name="ruta">Aquí va la ubicacion del archivo de word</param>
+        /// <param name="orientacion">Aquí se pasa un enum con los valores de la orientacion del documento</param>
+        /// <param name="tamanoHoja">Aquí se pasa una enum con lo tamaños de la hoja que se ncesiten</param>
+        public static void CambiarOrientacionDePaginaActual(string rutaDocumento)
+        {
+            Word.Application wordApp = new Word.Application();
+            Word.Document document = null;
+
+            try
+            {
+                // Abrir el documento
+                document = wordApp.Documents.Open(rutaDocumento);
+
+                // Insertar un salto de sección en la posición actual del cursor
+                wordApp.Selection.InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);
+
+                // Mover la selección al inicio de la próxima sección
+                wordApp.Selection.MoveDown(Word.WdUnits.wdLine, 1, Word.WdMovementType.wdMove);
+
+                // Cambiar la orientación de esta sección (la página actual)
+                Word.Section section = document.Sections[wordApp.Selection.Sections[1].Index];
+                section.PageSetup.Orientation = Word.WdOrientation.wdOrientLandscape;  // Cambia a wdOrientPortrait para orientación vertical
+
+                // Insertar otro salto de sección para separar la página actual del resto del documento
+                wordApp.Selection.InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);
+
+                // Cambiar la orientación de la sección siguiente (resto del documento) a la original
+                Word.Section nextSection = document.Sections[wordApp.Selection.Sections[1].Index];
+                nextSection.PageSetup.Orientation = Word.WdOrientation.wdOrientPortrait; // o lo que sea la orientación original
+
+                // Guardar y cerrar
+                document.Save();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+            finally
+            {
+                // Cerrar el documento y Word
+                document?.Close();
+                wordApp.Quit();
+            }
+        }
+
         public static void ActualizarCamposEnWord(string rutaArchivo)
         {
             // Crear una nueva aplicación Word
@@ -203,6 +253,15 @@ namespace funcionalidades_documento.crear_documento
             A5,
             B3,
             B4
+        }
+
+        /// <summary>
+        /// Enum con los valores de orientacion de las hojas del documento
+        /// </summary>
+        public enum Orientacion
+        {
+            Vertical,
+            Horizontal
         }
     }
 }
