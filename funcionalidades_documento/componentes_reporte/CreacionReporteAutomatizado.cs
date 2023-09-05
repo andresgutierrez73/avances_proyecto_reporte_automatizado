@@ -139,7 +139,7 @@ namespace funcionalidades_documento.componentes_reporte
                 SeccionesCuerpoReporte.PesoPropioEstructura(ruta);
                 SeccionesCuerpoReporte.CargasConexion(ruta);
                 SeccionesCuerpoReporte.CargasViento(ruta);
-                SeccionesCuerpoReporte.CargasSismo(ruta);
+                SeccionesCuerpoReporte.CargasSismo(ruta);   
                 SeccionesCuerpoReporte.CargasMontajeMantenimiento(ruta);
                 SeccionesCuerpoReporte.CombinacionesCarga(ruta);
                 SeccionesCuerpoReporte.NomenclaturaReporte(ruta);
