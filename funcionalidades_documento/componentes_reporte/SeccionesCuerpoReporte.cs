@@ -562,8 +562,9 @@ namespace funcionalidades_documento.componentes_reporte
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos1, 1, true);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesImagen.AgregarImagenDesdeBase64(ruta, base64Imagen, 5, 5, FuncionesCreacion.AlineacionImagen.Centro, $"Diagrama");
-                PropiedadesParrafo.AgregarParrafoConCita(ruta, "hola", 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado, "sdjifjifjf0", "andres", "gutierrez", "2022", "ieb");
-                PropiedadesParrafo.AgregarParrafoConCita(ruta, "hola2", 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado, "sdjifjifjf0", "andres", "gutierrez", "2022", "ieb");
+                PropiedadesParrafo.AgregarParrafoConCita(ruta, "hola", 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado, "biblio1", "andres", "gutierrez", "2022", "ieb");
+                PropiedadesParrafo.AgregarParrafoConCita(ruta, "que pasa", 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado, "biblio1");
+                PropiedadesParrafo.AgregarParrafoConCita(ruta, "adios", 12, FuncionesCreacion.EstiloParrafo.Normal, FuncionesCreacion.AlineacionTexto.Justificado, "biblio2", "andres juan", "gutierrez castro", "2023", "isa");
 
 
             }

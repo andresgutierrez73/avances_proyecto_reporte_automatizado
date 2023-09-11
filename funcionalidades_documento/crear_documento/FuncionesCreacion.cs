@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Word = Microsoft.Office.Interop.Word;
+using System.Linq;
 
 namespace funcionalidades_documento.crear_documento
 {
@@ -117,55 +118,64 @@ namespace funcionalidades_documento.crear_documento
             }
         }
 
-        /// <summary>
-        /// Método para cambiar la orientacion de una pagina determinada en un docmento de word,
-        /// antes de cambiar la orientacion es mejor usar antes un salto de pagina,
-        /// para que de esta forma no se cambie paginas las cuales no se necesitan
-        /// </summary>
-        /// <param name="ruta">Aquí va la ubicacion del archivo de word</param>
-        /// <param name="orientacion">Aquí se pasa un enum con los valores de la orientacion del documento</param>
-        /// <param name="tamanoHoja">Aquí se pasa una enum con lo tamaños de la hoja que se ncesiten</param>
-        public static void CambiarOrientacionDePaginaActual(string rutaDocumento)
-        {
-            Word.Application wordApp = new Word.Application();
-            Word.Document document = null;
 
+        public static void CambiarOrientacionPaginaEnDocumento(string rutaArchivo, bool aHorizontal)
+        {
+            // Iniciar la aplicación Word.
+            Word.Application wordApp = new Word.Application();
+            Word.Document doc = null;
             try
             {
-                // Abrir el documento
-                document = wordApp.Documents.Open(rutaDocumento);
+                // Abrir el documento.
+                doc = wordApp.Documents.Open(rutaArchivo);
 
-                // Insertar un salto de sección en la posición actual del cursor
-                wordApp.Selection.InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);
+                // Agregar un salto de sección al final del documento.
+                Word.Range endRange = doc.Content;
+                endRange.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+                endRange.InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);
 
-                // Mover la selección al inicio de la próxima sección
-                wordApp.Selection.MoveDown(Word.WdUnits.wdLine, 1, Word.WdMovementType.wdMove);
+                // Obtener la sección del salto insertado (sería la última sección).
+                Word.Section newSection = doc.Sections[doc.Sections.Count];
 
-                // Cambiar la orientación de esta sección (la página actual)
-                Word.Section section = document.Sections[wordApp.Selection.Sections[1].Index];
-                section.PageSetup.Orientation = Word.WdOrientation.wdOrientLandscape;  // Cambia a wdOrientPortrait para orientación vertical
+                // Cambiar la orientación de la nueva sección.
+                if (aHorizontal)
+                {
+                    newSection.PageSetup.Orientation = Word.WdOrientation.wdOrientLandscape;
+                }
+                else
+                {
+                    newSection.PageSetup.Orientation = Word.WdOrientation.wdOrientPortrait;
+                }
 
-                // Insertar otro salto de sección para separar la página actual del resto del documento
-                wordApp.Selection.InsertBreak(Word.WdBreakType.wdSectionBreakNextPage);
+                // Desvincular encabezados y pies de página de la sección anterior.
+                foreach (Word.HeaderFooter headerFooter in newSection.Headers)
+                {
+                    if (headerFooter.LinkToPrevious)
+                    {
+                        headerFooter.LinkToPrevious = false;
+                    }
+                }
 
-                // Cambiar la orientación de la sección siguiente (resto del documento) a la original
-                Word.Section nextSection = document.Sections[wordApp.Selection.Sections[1].Index];
-                nextSection.PageSetup.Orientation = Word.WdOrientation.wdOrientPortrait; // o lo que sea la orientación original
+                foreach (Word.HeaderFooter headerFooter in newSection.Footers)
+                {
+                    if (headerFooter.LinkToPrevious)
+                    {
+                        headerFooter.LinkToPrevious = false;
+                    }
+                }
 
-                // Guardar y cerrar
-                document.Save();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error: " + ex.Message);
+                // Guardar y cerrar el documento.
+                doc.Save();
             }
             finally
             {
-                // Cerrar el documento y Word
-                document?.Close();
+                // Cerrar el documento y liberar recursos.
+                if (doc != null)
+                    doc.Close(Word.WdSaveOptions.wdDoNotSaveChanges);
                 wordApp.Quit();
             }
         }
+
 
         public static void ActualizarCamposEnWord(string rutaArchivo)
         {
