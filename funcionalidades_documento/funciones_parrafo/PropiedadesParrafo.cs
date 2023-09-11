@@ -600,7 +600,9 @@ namespace funcionalidades_documento.funciones_parrafo
         }
 
         /// <summary>
-        /// Método para agregar una referencia / cita a un parrafo
+        /// Método para agregar una referencia / cita a un parrafo en el caso que se quiera añadir una referencia que ya existe entonces no es
+        /// necesario agregar los demas parametros siempre que se vaya a crear una referencia esta debe tener un id unico el cual es el 
+        /// nombre se la cita
         /// </summary>
         /// <param name="ruta">Aquí va a la ruta del documento de word</param>
         /// <param name="texto">Aquí va a el texto del parrafo que se va a mostrar</param>
@@ -612,7 +614,7 @@ namespace funcionalidades_documento.funciones_parrafo
         /// <param name="año">Aquí se inserta el año de a referencia</param>
         /// <param name="tituloLibro">Aquí se inserta un valor opcional con el nombre del libro</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void AgregarParrafoConCita(string ruta, string texto, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion, string nombreCita, string nombreAutor, string apellidoAutor, string año, string tituloLibro = "")
+        public static void AgregarParrafoConCita(string ruta, string texto, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion, string nombreCita, string nombreAutor = "", string apellidoAutor = "", string año = "", string tituloLibro = "")
         {
             tamanoFuente *= 2;
 
