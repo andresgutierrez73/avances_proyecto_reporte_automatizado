@@ -5,6 +5,8 @@ using System.IO;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Word = Microsoft.Office.Interop.Word;
 using System.Linq;
+using System.Collections.Generic;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 
 namespace funcionalidades_documento.crear_documento
 {
@@ -119,16 +121,19 @@ namespace funcionalidades_documento.crear_documento
         }
 
 
+
         public static void CambiarOrientacionPaginaEnDocumento(string rutaArchivo, bool aHorizontal)
         {
             // Iniciar la aplicación Word.
             Word.Application wordApp = new Word.Application();
             Word.Document doc = null;
+
             try
             {
                 // Abrir el documento.
                 doc = wordApp.Documents.Open(rutaArchivo);
 
+                // Cambio de orientación.
                 // Agregar un salto de sección al final del documento.
                 Word.Range endRange = doc.Content;
                 endRange.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
@@ -136,32 +141,28 @@ namespace funcionalidades_documento.crear_documento
 
                 // Obtener la sección del salto insertado (sería la última sección).
                 Word.Section newSection = doc.Sections[doc.Sections.Count];
+                newSection.PageSetup.Orientation = aHorizontal ? Word.WdOrientation.wdOrientLandscape : Word.WdOrientation.wdOrientPortrait;
 
-                // Cambiar la orientación de la nueva sección.
-                if (aHorizontal)
-                {
-                    newSection.PageSetup.Orientation = Word.WdOrientation.wdOrientLandscape;
-                }
-                else
-                {
-                    newSection.PageSetup.Orientation = Word.WdOrientation.wdOrientPortrait;
-                }
-
-                // Desvincular encabezados y pies de página de la sección anterior.
+                // Desvincular encabezados y pies de página de la sección anterior en la nueva sección creada.
                 foreach (Word.HeaderFooter headerFooter in newSection.Headers)
                 {
-                    if (headerFooter.LinkToPrevious)
-                    {
-                        headerFooter.LinkToPrevious = false;
-                    }
+                    headerFooter.LinkToPrevious = false;
                 }
 
                 foreach (Word.HeaderFooter headerFooter in newSection.Footers)
                 {
-                    if (headerFooter.LinkToPrevious)
-                    {
-                        headerFooter.LinkToPrevious = false;
-                    }
+                    headerFooter.LinkToPrevious = false;
+                }
+
+                // Eliminar el contenido del encabezado y del pie de página SOLO de la primera página de la nueva sección.
+                newSection.Headers[Word.WdHeaderFooterIndex.wdHeaderFooterFirstPage].Range.Text = "";
+                newSection.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterFirstPage].Range.Text = "";
+
+                // Si el pie de página de la primera página tiene tablas, eliminarlas.
+                Word.HeaderFooter firstPageFooter = newSection.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterFirstPage];
+                for (int tableIndex = firstPageFooter.Range.Tables.Count; tableIndex >= 1; tableIndex--)
+                {
+                    firstPageFooter.Range.Tables[tableIndex].Delete();
                 }
 
                 // Guardar y cerrar el documento.
@@ -175,6 +176,9 @@ namespace funcionalidades_documento.crear_documento
                 wordApp.Quit();
             }
         }
+
+
+
 
 
         public static void ActualizarCamposEnWord(string rutaArchivo)
@@ -231,6 +235,7 @@ namespace funcionalidades_documento.crear_documento
             Italico,
             Subrayado
         }
+
 
         /// <summary>
         /// Enum para los valores constantes de la alineación de textos
