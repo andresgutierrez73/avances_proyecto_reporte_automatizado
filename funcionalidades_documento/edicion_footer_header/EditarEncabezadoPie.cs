@@ -5,6 +5,8 @@ using funcionalidades_documento.funciones_tablas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Word = Microsoft.Office.Interop.Word;
+
 
 namespace funcionalidades_documento.edicion_footer_header
 {

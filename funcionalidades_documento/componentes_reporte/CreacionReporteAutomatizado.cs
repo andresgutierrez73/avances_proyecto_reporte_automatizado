@@ -139,16 +139,23 @@ namespace funcionalidades_documento.componentes_reporte
                 SeccionesCuerpoReporte.PesoPropioEstructura(ruta);
                 SeccionesCuerpoReporte.CargasConexion(ruta);
                 SeccionesCuerpoReporte.CargasViento(ruta);
-                SeccionesCuerpoReporte.CargasSismo(ruta); 
                 FuncionesCreacion.CambiarOrientacionPaginaEnDocumento(ruta, true);
+                SeccionesCuerpoReporte.CargasSismo(ruta); 
                 SeccionesCuerpoReporte.CargasMontajeMantenimiento(ruta);
                 SeccionesCuerpoReporte.CombinacionesCarga(ruta);
                 SeccionesCuerpoReporte.NomenclaturaReporte(ruta);
-                FuncionesCreacion.ActualizarCamposEnWord(ruta);
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
                 PropiedadesParrafo.AgregarTitulo(ruta, "referencias".ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
+                FuncionesCreacion.CambiarOrientacionPaginaEnDocumento(ruta, false);
                 PropiedadesParrafo.InsertarBibliografia(ruta);
+
+                // Aquí se crea un ciclo el cual va a llamar al método que refresca los campos del documento dos veces
+                for (int i = 0; i < 2; i++)
+                {
+                    FuncionesCreacion.ActualizarCamposEnWord(ruta);
+                }
+                
             }
             catch (Exception ex)
             {
