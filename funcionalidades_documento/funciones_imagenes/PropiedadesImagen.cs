@@ -19,7 +19,7 @@ namespace funcionalidades_documento.funciones_imagenes
         /// <param name="ruta">Aquí va la ruta del documento de word</param>
         /// <exception cref="ArgumentException"></exception>
         private static void ValidarRutaArchivo(string ruta)
-         {
+        {
             if (string.IsNullOrEmpty(ruta))
             {
                 throw new ArgumentException("La ruta no puede estar vacía.");
@@ -32,6 +32,8 @@ namespace funcionalidades_documento.funciones_imagenes
             }
         }
 
+
+        #region Métodos que usan la librería de openxml
         /// <summary>
         /// Método para generar el título con contador para las imágenes
         /// </summary>
@@ -65,6 +67,7 @@ namespace funcionalidades_documento.funciones_imagenes
 
             return paragraph;
         }
+
 
         /// <summary>
         /// Método para agregar una imágen a partir de una ruta del escritorio
@@ -178,6 +181,7 @@ namespace funcionalidades_documento.funciones_imagenes
             Console.WriteLine($"Imagen {rutaImagen} añadida al documento {rutaDocumento}");
         }
 
+
         /// <summary>
         /// Método para insertar una imágen decodificada en base64, este método inserta directamente la imágen dentro del
         /// contenido del documento, por lo que si se quiere insertar algo inmediato dentro del documento este es el método a usar
@@ -286,6 +290,7 @@ namespace funcionalidades_documento.funciones_imagenes
 
             Console.WriteLine($"Imagen añadida al documento {rutaDocumento}. Título: \"{tituloImagen ?? "Sin título"}\"");
         }
+
 
         /// <summary>
         /// Método para insertar una imágen decodificada en base64, este método necesita una mayor manupulación ya que no inserta
@@ -420,5 +425,10 @@ namespace funcionalidades_documento.funciones_imagenes
 
             return element;
         }
+        #endregion
+
+
+        #region Métodos que usan la librería de microsoft interop word
+        #endregion
     }
 }

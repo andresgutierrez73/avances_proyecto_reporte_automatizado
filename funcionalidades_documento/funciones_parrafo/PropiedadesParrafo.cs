@@ -31,6 +31,8 @@ namespace funcionalidades_documento.funciones_parrafo
             }
         }
 
+
+        #region Métodos que usan la librería de openxml
         /// <summary>
         /// Método para agregar un párrafo con estilo y alineación indicados al documento
         /// </summary>
@@ -40,7 +42,7 @@ namespace funcionalidades_documento.funciones_parrafo
         /// <param name="estilo">Aquí se pasa un enum con los estilos de letra predefinidos del word</param>
         /// <param name="alineacion">Aquí se pasa un enum con los tipos de alineación que hay en word</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void AgregarParrafo(string ruta, string texto, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion)    
+        public static void AgregarParrafo(string ruta, string texto, int tamanoFuente, EstiloParrafo estilo, AlineacionTexto alineacion)
         {
             tamanoFuente *= 2;
 
@@ -109,6 +111,7 @@ namespace funcionalidades_documento.funciones_parrafo
             Console.WriteLine("Agregando párrafo al documento: " + texto);
         }
 
+
         /// <summary>
         /// Método para definir la numeración multinivel
         /// </summary>
@@ -146,6 +149,7 @@ namespace funcionalidades_documento.funciones_parrafo
                 numberingPart.Numbering.Append(numberingInstance);
             }
         }
+
 
         /// <summary>
         /// Método para agregar un título con nivel específico y estilo personalizado
@@ -279,6 +283,7 @@ namespace funcionalidades_documento.funciones_parrafo
             Console.WriteLine($"Agregando título numerado nivel {nivelTitulo}: {titulo}");
         }
 
+
         /// <summary>
         /// Método para agregar saltos de linea
         /// </summary>
@@ -307,6 +312,7 @@ namespace funcionalidades_documento.funciones_parrafo
             Console.WriteLine($"Agregando {numEspacios} espacios al documento");
         }
 
+
         /// <summary>
         /// Método para agregar un salto de pagina en el documento de word
         /// </summary>
@@ -329,6 +335,7 @@ namespace funcionalidades_documento.funciones_parrafo
 
             Console.WriteLine("Agregando un salto de página al documento");
         }
+
 
         /// <summary>
         /// Método para la creación de una tabla de contenido
@@ -421,6 +428,7 @@ namespace funcionalidades_documento.funciones_parrafo
             Console.WriteLine("Agregando tabla de contenido al documento.");
         }
 
+
         /// <summary>
         /// Método para la creación de una tabla de tablas, en la cual se hace referencia a los titulos de las tablas del documento
         /// </summary>
@@ -510,6 +518,7 @@ namespace funcionalidades_documento.funciones_parrafo
             }
         }
 
+
         /// <summary>
         /// Método para crear una tabla de contenido en la cual se hace referencia a los titulos de las imagenes (leyenda)
         /// </summary>
@@ -598,7 +607,10 @@ namespace funcionalidades_documento.funciones_parrafo
                 }
             }
         }
+        #endregion
 
+
+        #region Métodos que usan la librería de microsoft interop word
         /// <summary>
         /// Método para agregar una referencia / cita a un parrafo en el caso que se quiera añadir una referencia que ya existe entonces no es
         /// necesario agregar los demas parametros siempre que se vaya a crear una referencia esta debe tener un id unico el cual es el 
@@ -735,6 +747,7 @@ namespace funcionalidades_documento.funciones_parrafo
             wordApp.Quit();
         }
 
+
         /// <summary>
         /// Método para hacer la bibliografía con el formato IEEE
         /// </summary>
@@ -783,6 +796,7 @@ namespace funcionalidades_documento.funciones_parrafo
                 }
             }
         }
+
 
         /// <summary>
         /// Este método usa la libreria de microsoft office interop para hacer las listas con viñetas, de este modo la numeración
@@ -858,5 +872,6 @@ namespace funcionalidades_documento.funciones_parrafo
 
             Console.WriteLine("Agregando listado con viñetas al documento.");
         }
+        #endregion
     }
 }

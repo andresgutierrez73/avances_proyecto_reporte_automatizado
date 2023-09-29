@@ -5,6 +5,7 @@ using funcionalidades_documento.funciones_tablas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using Word = Microsoft.Office.Interop.Word;
 
 
@@ -31,6 +32,8 @@ namespace funcionalidades_documento.edicion_footer_header
             }
         }
 
+
+        #region Métodos que usan la librería openxml
         /// <summary>
         /// Método para establecer el encabezado con el formato del documento
         /// </summary>
@@ -39,100 +42,107 @@ namespace funcionalidades_documento.edicion_footer_header
         /// <returns></returns>
         public static Header nuevoEncabezado(string titulo, string preTitulo)
         {
-            Header header = new Header();
+            try
+            {
+                Header header = new Header();
 
-            #region NameSpaces
-            header.AddNamespaceDeclaration("wpc", "http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas");
-            header.AddNamespaceDeclaration("mc", "http://schemas.openxmlformats.org/markup-compatibility/2006");
-            header.AddNamespaceDeclaration("o", "urn:schemas-microsoft-com:office:office");
-            header.AddNamespaceDeclaration("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
-            header.AddNamespaceDeclaration("m", "http://schemas.openxmlformats.org/officeDocument/2006/math");
-            header.AddNamespaceDeclaration("v", "urn:schemas-microsoft-com:vml");
-            header.AddNamespaceDeclaration("wp14", "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing");
-            header.AddNamespaceDeclaration("wp", "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing");
-            header.AddNamespaceDeclaration("w10", "urn:schemas-microsoft-com:office:word");
-            header.AddNamespaceDeclaration("w", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
-            header.AddNamespaceDeclaration("w14", "http://schemas.microsoft.com/office/word/2010/wordml");
-            header.AddNamespaceDeclaration("wpg", "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup");
-            header.AddNamespaceDeclaration("wpi", "http://schemas.microsoft.com/office/word/2010/wordprocessingInk");
-            header.AddNamespaceDeclaration("wne", "http://schemas.microsoft.com/office/word/2006/wordml");
-            header.AddNamespaceDeclaration("wps", "http://schemas.microsoft.com/office/word/2010/wordprocessingShape");
-            #endregion
+                #region NameSpaces
+                header.AddNamespaceDeclaration("wpc", "http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas");
+                header.AddNamespaceDeclaration("mc", "http://schemas.openxmlformats.org/markup-compatibility/2006");
+                header.AddNamespaceDeclaration("o", "urn:schemas-microsoft-com:office:office");
+                header.AddNamespaceDeclaration("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
+                header.AddNamespaceDeclaration("m", "http://schemas.openxmlformats.org/officeDocument/2006/math");
+                header.AddNamespaceDeclaration("v", "urn:schemas-microsoft-com:vml");
+                header.AddNamespaceDeclaration("wp14", "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing");
+                header.AddNamespaceDeclaration("wp", "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing");
+                header.AddNamespaceDeclaration("w10", "urn:schemas-microsoft-com:office:word");
+                header.AddNamespaceDeclaration("w", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
+                header.AddNamespaceDeclaration("w14", "http://schemas.microsoft.com/office/word/2010/wordml");
+                header.AddNamespaceDeclaration("wpg", "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup");
+                header.AddNamespaceDeclaration("wpi", "http://schemas.microsoft.com/office/word/2010/wordprocessingInk");
+                header.AddNamespaceDeclaration("wne", "http://schemas.microsoft.com/office/word/2006/wordml");
+                header.AddNamespaceDeclaration("wps", "http://schemas.microsoft.com/office/word/2010/wordprocessingShape");
+                #endregion
 
-            Table headerTable = new Table(new TableProperties(
-                new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct },
-                new TableBorders(
-                    new BottomBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 10 },
-                    new InsideHorizontalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 10 },
-
-                    new TopBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
-                    new LeftBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
-                    new RightBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
-                    new InsideVerticalBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 }
-                ),
-                new TableCellMarginDefault(
-                    new TopMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
-                    new StartMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
-                    new BottomMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
-                    new EndMargin() { Width = "0", Type = TableWidthUnitValues.Dxa }
-                )
-            ));
-
-
-            TableRow headerRow1 = new TableRow();
-            TableRow headerRow2 = new TableRow();
-
-            TableCell headerCell11 = new TableCell(
-                new Paragraph(
-                    new ParagraphProperties(
-                        new Justification() { Val = JustificationValues.Left },
-                        new SpacingBetweenLines() { Before = "0", After = "22" },
-                        new Languages() { Val = "es-ES" }
+                Table headerTable = new Table(new TableProperties(
+                    new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct },
+                    new TableBorders(
+                        new BottomBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 10 },
+                        new InsideHorizontalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 10 },
+                        new TopBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
+                        new LeftBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
+                        new RightBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
+                        new InsideVerticalBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 }
                     ),
-                    new Run(
-                        new RunProperties(new FontSize() { Val = "18" }, new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" }),
-                        new Text(preTitulo)
+                    new TableCellMarginDefault(
+                        new TopMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
+                        new StartMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
+                        new BottomMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
+                        new EndMargin() { Width = "0", Type = TableWidthUnitValues.Dxa }
                     )
-                )
-            );
-            TableCell headerCell21 = new TableCell(
-                new Paragraph(
-                    new ParagraphProperties(
-                        new Justification() { Val = JustificationValues.Left },
-                        new SpacingBetweenLines() { Before = "0", After = "22" },
-                        new Languages() { Val = "es-ES" }
-                    ),
-                    new Run(
-                        new RunProperties(new FontSize() { Val = "18" }, new Bold(), new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" }),
-                        new Text(titulo)
+                ));
+
+                TableRow headerRow1 = new TableRow();
+                TableRow headerRow2 = new TableRow();
+
+                TableCell headerCell11 = new TableCell(
+                    new Paragraph(
+                        new ParagraphProperties(
+                            new Justification() { Val = JustificationValues.Left },
+                            new SpacingBetweenLines() { Before = "0", After = "22" },
+                            new Languages() { Val = "es-ES" }
+                        ),
+                        new Run(
+                            new RunProperties(new FontSize() { Val = "18" }, new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" }),
+                            new Text(preTitulo)
+                        )
                     )
-                )
-            );
-            TableCell headerCell22 = new TableCell(
-                new Paragraph(
-                    new ParagraphProperties(
-                        new Justification() { Val = JustificationValues.Right },
-                        new SpacingBetweenLines() { Before = "0", After = "22" },
-                        new Languages() { Val = "es-ES" }
-                    ),
-                    new Run(
-                        new StyleRunProperties(new FontSize() { Val = "18" }, new Bold(), new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" }),
-                        new Text("Página ") { Space = SpaceProcessingModeValues.Preserve },
-                        new SimpleField() { Instruction = "PAGE" },
-                        new Text(" de ") { Space = SpaceProcessingModeValues.Preserve },
-                        new SimpleField() { Instruction = "NUMPAGES" }
+                );
+                TableCell headerCell21 = new TableCell(
+                    new Paragraph(
+                        new ParagraphProperties(
+                            new Justification() { Val = JustificationValues.Left },
+                            new SpacingBetweenLines() { Before = "0", After = "22" },
+                            new Languages() { Val = "es-ES" }
+                        ),
+                        new Run(
+                            new RunProperties(new FontSize() { Val = "18" }, new Bold(), new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" }),
+                            new Text(titulo)
+                        )
                     )
-                )
-            );
+                );
+                TableCell headerCell22 = new TableCell(
+                    new Paragraph(
+                        new ParagraphProperties(
+                            new Justification() { Val = JustificationValues.Right },
+                            new SpacingBetweenLines() { Before = "0", After = "22" },
+                            new Languages() { Val = "es-ES" }
+                        ),
+                        new Run(
+                            new StyleRunProperties(new FontSize() { Val = "18" }, new Bold(), new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" }),
+                            new Text("Página ") { Space = SpaceProcessingModeValues.Preserve },
+                            new SimpleField() { Instruction = "PAGE" },
+                            new Text(" de ") { Space = SpaceProcessingModeValues.Preserve },
+                            new SimpleField() { Instruction = "NUMPAGES" }
+                        )
+                    )
+                );
 
-            headerRow1.Append(headerCell11);
-            headerRow2.Append(headerCell21, headerCell22);
+                headerRow1.Append(headerCell11);
+                headerRow2.Append(headerCell21, headerCell22);
 
-            headerTable.Append(headerRow1, headerRow2);
-            header.Append(headerTable);
+                headerTable.Append(headerRow1, headerRow2);
+                header.Append(headerTable);
 
-            return header;
+                return header;
+            }
+            catch (Exception ex)
+            {
+                // Puedes manejar la excepción aquí. Por simplicidad, simplemente la lanzaré nuevamente.
+                throw ex;
+            }
         }
+
 
         /// <summary>
         /// Método para añadir en encabezado en el documento de word a partir del formato del metodo anterior
@@ -144,71 +154,81 @@ namespace funcionalidades_documento.edicion_footer_header
         /// <exception cref="ArgumentNullException"></exception>
         public static void EditarEncabezado(string ruta, string textoAbajo, string textoArriba, double altura)
         {
-            ValidarRutaArchivo(ruta);
-
-            // Conversion de cm a puntos (1 cm = 28.3465 puntos)
-            int alturaEnPuntos = (int)(360000 * altura);
-
-            using (var document = WordprocessingDocument.Open(ruta, true))
+            try
             {
-                if (document == null)
-                {
-                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
-                }
+                ValidarRutaArchivo(ruta);
 
-                var mainPart = document.MainDocumentPart;
+                // Conversion de cm a puntos (1 cm = 28.3465 puntos)
+                int alturaEnPuntos = (int)(360000 * altura);
 
-                HeaderPart headerPart;
-                if (mainPart.HeaderParts.Count() > 0)
+                using (var document = WordprocessingDocument.Open(ruta, true))
                 {
-                    headerPart = mainPart.HeaderParts.First();
-                }
-                else
-                {
-                    headerPart = mainPart.AddNewPart<HeaderPart>();
-                    mainPart.Document.Save();
-                }
+                    if (document == null)
+                    {
+                        throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
+                    }
 
-                var header = nuevoEncabezado(textoArriba, textoAbajo);
-                var paragraphProperties = header.Descendants<ParagraphProperties>().FirstOrDefault();
-                if (paragraphProperties == null)
-                {
-                    paragraphProperties = new ParagraphProperties();
-                    header.Descendants<Paragraph>().First().PrependChild(paragraphProperties);
-                }
-                var spacingBetweenLines = paragraphProperties.Descendants<SpacingBetweenLines>().FirstOrDefault();
-                if (spacingBetweenLines == null)
-                {
-                    spacingBetweenLines = new SpacingBetweenLines();
-                    paragraphProperties.AppendChild(spacingBetweenLines);
-                }
-                spacingBetweenLines.After = "0";
-                spacingBetweenLines.Line = alturaEnPuntos.ToString();
-                spacingBetweenLines.LineRule = LineSpacingRuleValues.Auto;
+                    var mainPart = document.MainDocumentPart;
 
-                headerPart.Header = header;
+                    HeaderPart headerPart;
+                    if (mainPart.HeaderParts.Count() > 0)
+                    {
+                        headerPart = mainPart.HeaderParts.First();
+                    }
+                    else
+                    {
+                        headerPart = mainPart.AddNewPart<HeaderPart>();
+                        mainPart.Document.Save();
+                    }
 
-                // Agregar la referencia al encabezado en el documento principal
-                if (mainPart.Document.Body.Elements<SectionProperties>().Any())
-                {
-                    SectionProperties sectionProperties = mainPart.Document.Body.Elements<SectionProperties>().First();
-                    HeaderReference headerReference = new HeaderReference { Id = mainPart.GetIdOfPart(headerPart), Type = HeaderFooterValues.Default }; // Tipo por defecto
-                    sectionProperties.RemoveAllChildren<HeaderReference>();
-                    sectionProperties.PrependChild(headerReference);
+                    var header = nuevoEncabezado(textoArriba, textoAbajo);
+                    var paragraphProperties = header.Descendants<ParagraphProperties>().FirstOrDefault();
+                    if (paragraphProperties == null)
+                    {
+                        paragraphProperties = new ParagraphProperties();
+                        header.Descendants<Paragraph>().First().PrependChild(paragraphProperties);
+                    }
+                    var spacingBetweenLines = paragraphProperties.Descendants<SpacingBetweenLines>().FirstOrDefault();
+                    if (spacingBetweenLines == null)
+                    {
+                        spacingBetweenLines = new SpacingBetweenLines();
+                        paragraphProperties.AppendChild(spacingBetweenLines);
+                    }
+                    spacingBetweenLines.After = "0";
+                    spacingBetweenLines.Line = alturaEnPuntos.ToString();
+                    spacingBetweenLines.LineRule = LineSpacingRuleValues.Auto;
 
-                    // Configurar el encabezado diferente para la primera página
-                    TitlePage titlePage = new TitlePage();
-                    sectionProperties.RemoveAllChildren<TitlePage>();
-                    sectionProperties.PrependChild(titlePage);
+                    headerPart.Header = header;
+
+                    // Agregar la referencia al encabezado en el documento principal
+                    if (mainPart.Document.Body.Elements<SectionProperties>().Any())
+                    {
+                        SectionProperties sectionProperties = mainPart.Document.Body.Elements<SectionProperties>().First();
+                        HeaderReference headerReference = new HeaderReference { Id = mainPart.GetIdOfPart(headerPart), Type = HeaderFooterValues.Default }; // Tipo por defecto
+                        sectionProperties.RemoveAllChildren<HeaderReference>();
+                        sectionProperties.PrependChild(headerReference);
+
+                        // Configurar el encabezado diferente para la primera página
+                        TitlePage titlePage = new TitlePage();
+                        sectionProperties.RemoveAllChildren<TitlePage>();
+                        sectionProperties.PrependChild(titlePage);
+                    }
+                    else
+                    {
+                        mainPart.Document.Body.Append(new SectionProperties(new HeaderReference { Id = mainPart.GetIdOfPart(headerPart), Type = HeaderFooterValues.Default }, new TitlePage()));
+                    }
+
+                    document.Save();
                 }
-                else
-                {
-                    mainPart.Document.Body.Append(new SectionProperties(new HeaderReference { Id = mainPart.GetIdOfPart(headerPart), Type = HeaderFooterValues.Default }, new TitlePage()));
-                }
-
-                document.Save();
+            }
+            catch (Exception ex)
+            {
+                // Aquí puedes manejar la excepción o lanzarla nuevamente, según lo que necesites.
+                // Por simplicidad, simplemente la lanzaré nuevamente.
+                throw ex;
             }
         }
+
 
         /// <summary>
         /// Método que retorna un objeto de tipo Footer con un formato específico como en este caso que es un tabla personalizada con un texto
@@ -217,66 +237,75 @@ namespace funcionalidades_documento.edicion_footer_header
         /// <returns>Esté método retorna un pie de página, por lo cual no lo agrega directemente al documento</returns>
         public static Footer nuevoPie(string textoPie)
         {
-            Footer footer = new Footer();
+            try
+            {
+                Footer footer = new Footer();
 
-            #region NameSpaces
-            footer.AddNamespaceDeclaration("wpc", "http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas");
-            footer.AddNamespaceDeclaration("mc", "http://schemas.openxmlformats.org/markup-compatibility/2006");
-            footer.AddNamespaceDeclaration("o", "urn:schemas-microsoft-com:office:office");
-            footer.AddNamespaceDeclaration("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
-            footer.AddNamespaceDeclaration("m", "http://schemas.openxmlformats.org/officeDocument/2006/math");
-            footer.AddNamespaceDeclaration("v", "urn:schemas-microsoft-com:vml");
-            footer.AddNamespaceDeclaration("wp14", "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing");
-            footer.AddNamespaceDeclaration("wp", "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing");
-            footer.AddNamespaceDeclaration("w10", "urn:schemas-microsoft-com:office:word");
-            footer.AddNamespaceDeclaration("w", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
-            footer.AddNamespaceDeclaration("w14", "http://schemas.microsoft.com/office/word/2010/wordml");
-            footer.AddNamespaceDeclaration("wpg", "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup");
-            footer.AddNamespaceDeclaration("wpi", "http://schemas.microsoft.com/office/word/2010/wordprocessingInk");
-            footer.AddNamespaceDeclaration("wne", "http://schemas.microsoft.com/office/word/2006/wordml");
-            footer.AddNamespaceDeclaration("wps", "http://schemas.microsoft.com/office/word/2010/wordprocessingShape");
-            #endregion
+                #region NameSpaces
+                footer.AddNamespaceDeclaration("wpc", "http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas");
+                footer.AddNamespaceDeclaration("mc", "http://schemas.openxmlformats.org/markup-compatibility/2006");
+                footer.AddNamespaceDeclaration("o", "urn:schemas-microsoft-com:office:office");
+                footer.AddNamespaceDeclaration("r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
+                footer.AddNamespaceDeclaration("m", "http://schemas.openxmlformats.org/officeDocument/2006/math");
+                footer.AddNamespaceDeclaration("v", "urn:schemas-microsoft-com:vml");
+                footer.AddNamespaceDeclaration("wp14", "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing");
+                footer.AddNamespaceDeclaration("wp", "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing");
+                footer.AddNamespaceDeclaration("w10", "urn:schemas-microsoft-com:office:word");
+                footer.AddNamespaceDeclaration("w", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
+                footer.AddNamespaceDeclaration("w14", "http://schemas.microsoft.com/office/word/2010/wordml");
+                footer.AddNamespaceDeclaration("wpg", "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup");
+                footer.AddNamespaceDeclaration("wpi", "http://schemas.microsoft.com/office/word/2010/wordprocessingInk");
+                footer.AddNamespaceDeclaration("wne", "http://schemas.microsoft.com/office/word/2006/wordml");
+                footer.AddNamespaceDeclaration("wps", "http://schemas.microsoft.com/office/word/2010/wordprocessingShape");
+                #endregion
 
-            Table footerTable = new Table(new TableProperties(
-                new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct },
-                new TableBorders(
-                    new TopBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 10 },
-
-                    new BottomBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
-                    new LeftBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
-                    new RightBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
-                    new InsideVerticalBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
-                    new InsideHorizontalBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 }
-                ),
-                new TableCellMarginDefault(
-                    new TopMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
-                    new StartMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
-                    new BottomMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
-                    new EndMargin() { Width = "0", Type = TableWidthUnitValues.Dxa }
-                )
-            ));
-
-            TableRow footerRow1 = new TableRow();
-            TableCell footerCell11 = new TableCell(
-                new Paragraph(
-                    new ParagraphProperties(
-                        new Justification() { Val = JustificationValues.Right },
-                        new SpacingBetweenLines() { Before = "0", After = "22" },
-                        new Languages() { Val = "es-ES" }
+                Table footerTable = new Table(new TableProperties(
+                    new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct },
+                    new TableBorders(
+                        new TopBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 10 },
+                        new BottomBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
+                        new LeftBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
+                        new RightBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
+                        new InsideVerticalBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 },
+                        new InsideHorizontalBorder() { Val = new EnumValue<BorderValues>(BorderValues.None), Size = 0 }
                     ),
-                    new Run(
-                        new RunProperties(new FontSize() { Val = "18" }, new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" }),
-                        new Text(textoPie)
+                    new TableCellMarginDefault(
+                        new TopMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
+                        new StartMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
+                        new BottomMargin() { Width = "0", Type = TableWidthUnitValues.Dxa },
+                        new EndMargin() { Width = "0", Type = TableWidthUnitValues.Dxa }
                     )
-                )
-            );
+                ));
 
-            footerRow1.Append(footerCell11);
-            footerTable.Append(footerRow1);
-            footer.Append(footerTable);
+                TableRow footerRow1 = new TableRow();
+                TableCell footerCell11 = new TableCell(
+                    new Paragraph(
+                        new ParagraphProperties(
+                            new Justification() { Val = JustificationValues.Right },
+                            new SpacingBetweenLines() { Before = "0", After = "22" },
+                            new Languages() { Val = "es-ES" }
+                        ),
+                        new Run(
+                            new RunProperties(new FontSize() { Val = "18" }, new RunFonts() { Ascii = "Arial", HighAnsi = "Arial", ComplexScript = "Arial" }),
+                            new Text(textoPie)
+                        )
+                    )
+                );
 
-            return footer;
+                footerRow1.Append(footerCell11);
+                footerTable.Append(footerRow1);
+                footer.Append(footerTable);
+
+                return footer;
+            }
+            catch (Exception ex)
+            {
+                // Aquí puedes manejar la excepción o lanzarla nuevamente, según lo que necesites.
+                // Por simplicidad, simplemente la lanzaré nuevamente.
+                throw ex;
+            }
         }
+
 
         /// <summary>
         /// Método encargado de recibir un texto y de manipula un footer para insertarlo en el documento
@@ -287,63 +316,119 @@ namespace funcionalidades_documento.edicion_footer_header
         /// <exception cref="ArgumentNullException">Aquí va el texto que irá en el pie de la primera página del documento</exception>
         public static void EditarPieDePagina(string ruta, string texto, List<List<string>> datosTabla)
         {
-            ValidarRutaArchivo(ruta);
-
-            using (var document = WordprocessingDocument.Open(ruta, true))
+            try
             {
-                if (document == null)
+                ValidarRutaArchivo(ruta);
+
+                using (var document = WordprocessingDocument.Open(ruta, true))
                 {
-                    throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
+                    if (document == null)
+                    {
+                        throw new ArgumentNullException(nameof(document), "El documento no puede ser nulo.");
+                    }
+
+                    var mainPart = document.MainDocumentPart;
+
+                    // Pie de página para las demás páginas
+                    FooterPart footerPart;
+                    if (mainPart.FooterParts.Count() > 0)
+                    {
+                        footerPart = mainPart.FooterParts.First();
+                    }
+                    else
+                    {
+                        footerPart = mainPart.AddNewPart<FooterPart>();
+                        mainPart.Document.Save();
+                    }
+
+                    var footer = nuevoPie(texto);  // Asegúrate de que esta función pueda trabajar con FooterPart si es necesario.
+                    footerPart.Footer = footer;
+
+                    // Pie de página para la primera página
+                    FooterPart firstPageFooterPart = mainPart.AddNewPart<FooterPart>();
+
+                    // Crear la tabla con imágenes para el pie de página de la primera página
+                    Table tablaConImagen = PropiedadesTabla.CrearTablaConImagen(firstPageFooterPart, datosTabla);  // Modificado para pasar FooterPart
+
+                    // Crea el pie de página para la primera página y añade la tabla directamente a él
+                    var firstPageFooter = new Footer();
+                    firstPageFooter.Append(tablaConImagen);
+
+                    firstPageFooterPart.Footer = firstPageFooter;
+                    firstPageFooterPart.Footer.Save();
+
+                    SectionProperties sectionProperties;
+                    if (mainPart.Document.Body.Elements<SectionProperties>().Any())
+                    {
+                        sectionProperties = mainPart.Document.Body.Elements<SectionProperties>().First();
+                    }
+                    else
+                    {
+                        sectionProperties = new SectionProperties();
+                        mainPart.Document.Body.Append(sectionProperties);
+                    }
+
+                    // Elimina referencias existentes y agrega nuevas referencias
+                    sectionProperties.RemoveAllChildren<FooterReference>();
+                    sectionProperties.Append(new FooterReference { Id = mainPart.GetIdOfPart(footerPart), Type = HeaderFooterValues.Default }); // Para las demás páginas
+                    sectionProperties.Append(new FooterReference { Id = mainPart.GetIdOfPart(firstPageFooterPart), Type = HeaderFooterValues.First }); // Para la primera página
+
+                    document.Save();
                 }
-
-                var mainPart = document.MainDocumentPart;
-
-                // Pie de página para las demás páginas
-                FooterPart footerPart;
-                if (mainPart.FooterParts.Count() > 0)
-                {
-                    footerPart = mainPart.FooterParts.First();
-                }
-                else
-                {
-                    footerPart = mainPart.AddNewPart<FooterPart>();
-                    mainPart.Document.Save();
-                }
-
-                var footer = nuevoPie(texto);  // Asegúrate de que esta función pueda trabajar con FooterPart si es necesario.
-                footerPart.Footer = footer;
-
-                // Pie de página para la primera página
-                FooterPart firstPageFooterPart = mainPart.AddNewPart<FooterPart>();
-
-                // Crear la tabla con imágenes para el pie de página de la primera página
-                Table tablaConImagen = PropiedadesTabla.CrearTablaConImagen(firstPageFooterPart, datosTabla);  // Modificado para pasar FooterPart
-
-                // Crea el pie de página para la primera página y añade la tabla directamente a él
-                var firstPageFooter = new Footer();
-                firstPageFooter.Append(tablaConImagen);
-
-                firstPageFooterPart.Footer = firstPageFooter;
-                firstPageFooterPart.Footer.Save();
-
-                SectionProperties sectionProperties;
-                if (mainPart.Document.Body.Elements<SectionProperties>().Any())
-                {
-                    sectionProperties = mainPart.Document.Body.Elements<SectionProperties>().First();
-                }
-                else
-                {
-                    sectionProperties = new SectionProperties();
-                    mainPart.Document.Body.Append(sectionProperties);
-                }
-
-                // Elimina referencias existentes y agrega nuevas referencias
-                sectionProperties.RemoveAllChildren<FooterReference>();
-                sectionProperties.Append(new FooterReference { Id = mainPart.GetIdOfPart(footerPart), Type = HeaderFooterValues.Default }); // Para las demás páginas
-                sectionProperties.Append(new FooterReference { Id = mainPart.GetIdOfPart(firstPageFooterPart), Type = HeaderFooterValues.First }); // Para la primera página
-
-                document.Save();
+            }
+            catch (Exception ex)
+            {
+                // Aquí puedes manejar la excepción o lanzarla nuevamente, según lo que necesites.
+                // Por simplicidad, simplemente la lanzaré nuevamente.
+                throw ex;
             }
         }
+        #endregion
+
+
+        #region Métodos que usan la librería microsoft interop word
+        public static void CrearPieDePagina(Word.Section section, string textoPie, bool firstPage = false)
+        {
+            try
+            {
+                Word.HeaderFooter footer;
+                if (firstPage)
+                {
+                    footer = section.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterFirstPage];
+                }
+                else
+                {
+                    footer = section.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary];
+                }
+
+                // Verificar si el pie de página contiene una tabla
+                if (footer.Range.Tables.Count > 0)
+                {
+                    // Eliminar la tabla del pie de página
+                    footer.Range.Tables[1].Delete();
+                }
+
+                // Agregar el nuevo contenido al pie de página
+                Word.Paragraph paragraph = footer.Range.Paragraphs.Add();
+                paragraph.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+
+                Word.Border border = paragraph.Borders[Word.WdBorderType.wdBorderTop];
+                border.LineStyle = Word.WdLineStyle.wdLineStyleSingle;
+                border.LineWidth = Word.WdLineWidth.wdLineWidth150pt;
+
+                Word.Font font = paragraph.Range.Font;
+                font.Size = 9;
+                font.Name = "Arial";
+
+                paragraph.Range.Text = textoPie;
+            }
+            catch (Exception ex)
+            {
+                // Aquí puedes manejar la excepción o lanzarla nuevamente.
+                throw new ApplicationException("Ocurrió un error al crear el pie de página.", ex);
+            }
+        }
+        #endregion
+        
     }
 }
