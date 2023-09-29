@@ -139,15 +139,17 @@ namespace funcionalidades_documento.componentes_reporte
                 SeccionesCuerpoReporte.PesoPropioEstructura(ruta);
                 SeccionesCuerpoReporte.CargasConexion(ruta);
                 SeccionesCuerpoReporte.CargasViento(ruta);
-                FuncionesCreacion.CambiarOrientacionPaginaEnDocumento(ruta, true);
+                //FuncionesCreacion.CambiarOrientacionPaginaEnDocumento(ruta, true, "Archivo: CO-RBAN-14113-S-01-D1531");
+                FuncionesCreacion.CambiarOrientacion(ruta, FuncionesCreacion.Orientacion.Horizontal);
                 SeccionesCuerpoReporte.CargasSismo(ruta); 
                 SeccionesCuerpoReporte.CargasMontajeMantenimiento(ruta);
                 SeccionesCuerpoReporte.CombinacionesCarga(ruta);
                 SeccionesCuerpoReporte.NomenclaturaReporte(ruta);
+                FuncionesCreacion.CambiarOrientacion(ruta, FuncionesCreacion.Orientacion.Vertical);
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
                 PropiedadesParrafo.AgregarTitulo(ruta, "referencias".ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
-                FuncionesCreacion.CambiarOrientacionPaginaEnDocumento(ruta, false);
+                //FuncionesCreacion.CambiarOrientacionPaginaEnDocumento(ruta, false, "Archivo: otro pie");
                 PropiedadesParrafo.InsertarBibliografia(ruta);
 
                 // Aquí se crea un ciclo el cual va a llamar al método que refresca los campos del documento dos veces

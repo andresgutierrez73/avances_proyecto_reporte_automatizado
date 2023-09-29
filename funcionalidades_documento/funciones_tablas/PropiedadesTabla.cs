@@ -31,6 +31,7 @@ namespace funcionalidades_documento.funciones_tablas
             }
         }
 
+        #region Métodos que usan la librería de openxml
         /// <summary>
         /// Método encargado de hacel el prefijo de los titulos de las tablas
         /// ademas de agregar una numeración especial para que los titulos de las tablas puedan ser referenciados 
@@ -69,6 +70,7 @@ namespace funcionalidades_documento.funciones_tablas
 
             return paragraph;
         }
+
 
         /// <summary>
         /// Método para la creacion de tablas personalizadas en el documento
@@ -199,6 +201,7 @@ namespace funcionalidades_documento.funciones_tablas
 
             Console.WriteLine($"Se agregó una tabla al documento.");
         }
+
 
         /// <summary>
         /// Método sobreconstruido en el cual se pasa el parametro del titulo de la tabla
@@ -339,6 +342,7 @@ namespace funcionalidades_documento.funciones_tablas
             Console.WriteLine($"Se agregó una tabla con el título \"{titulo}\" al documento.");
         }
 
+
         /// <summary>
         /// Método para crear la tabla de firmas del documento
         /// </summary>
@@ -476,6 +480,7 @@ namespace funcionalidades_documento.funciones_tablas
             Console.WriteLine($"Se agregó una tabla al documento.");
         }
 
+
         /// <summary>
         /// Método encargado de insertar directamente en el documento de word una tabla
         /// que puede contener imagenes dentro, las imágenes deben estar decodificadas en un base64
@@ -605,5 +610,10 @@ namespace funcionalidades_documento.funciones_tablas
 
             return table;
         }
+        #endregion
+
+
+        #region Métodos que usan la librería de microsoft interop word
+        #endregion
     }
 }

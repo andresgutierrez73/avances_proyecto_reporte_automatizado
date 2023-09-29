@@ -7,6 +7,7 @@ using Word = Microsoft.Office.Interop.Word;
 using System.Linq;
 using System.Collections.Generic;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using funcionalidades_documento.edicion_footer_header;
 
 namespace funcionalidades_documento.crear_documento
 {
@@ -38,6 +39,7 @@ namespace funcionalidades_documento.crear_documento
             return createFile.FileName;
         }
 
+        #region Métodos que usan la librería de openxml
         /// <summary>
         /// Método para generar un documento de Word en una ruta específica
         /// </summary>
@@ -120,16 +122,84 @@ namespace funcionalidades_documento.crear_documento
             }
         }
 
-
-
-        public static void CambiarOrientacionPaginaEnDocumento(string rutaArchivo, bool aHorizontal)
+        public static void CambiarOrientacion(string ruta, Orientacion orientacion)
         {
-            // Iniciar la aplicación Word.
-            Word.Application wordApp = new Word.Application();
+            try
+            {
+                using (WordprocessingDocument doc = WordprocessingDocument.Open(ruta, true))
+                {
+                    MainDocumentPart mainPart = doc.MainDocumentPart;
+
+                    if (mainPart == null)
+                    {
+                        throw new InvalidOperationException("El documento no contiene una parte principal.");
+                    }
+
+                    SectionProperties lastSectPr = mainPart.Document.Body.Elements<SectionProperties>().LastOrDefault();
+
+                    // Si no hay ninguna sección en el documento, la creamos.
+                    if (lastSectPr == null)
+                    {
+                        lastSectPr = new SectionProperties();
+                        mainPart.Document.Body.Append(lastSectPr);
+                    }
+
+                    // Creamos un nuevo salto de sección.
+                    Paragraph breakParagraph = new Paragraph();
+                    ParagraphProperties paraProps = new ParagraphProperties();
+                    SectionProperties newSectPr = (SectionProperties)lastSectPr.CloneNode(true); // Copiamos las propiedades de la sección anterior
+                    breakParagraph.Append(paraProps);
+                    paraProps.Append(newSectPr);
+                    mainPart.Document.Body.Append(breakParagraph);
+
+                    // Definimos la nueva orientación en la sección original
+                    PageSize pageSize = new PageSize();
+
+                    switch (orientacion)
+                    {
+                        case Orientacion.Horizontal:
+                            pageSize.Width = (UInt32Value)15840U; // 11 pulgadas
+                            pageSize.Height = (UInt32Value)12240U; // 8.5 pulgadas
+                            pageSize.Orient = PageOrientationValues.Landscape;
+                            break;
+                        case Orientacion.Vertical:
+                        default:
+                            pageSize.Width = (UInt32Value)12240U; // 8.5 pulgadas
+                            pageSize.Height = (UInt32Value)15840U; // 11 pulgadas
+                            pageSize.Orient = PageOrientationValues.Portrait;
+                            break;
+                    }
+
+                    // Si la sección anterior ya tiene un elemento PageSize, lo eliminamos para reemplazarlo
+                    PageSize oldPageSize = lastSectPr.GetFirstChild<PageSize>();
+                    if (oldPageSize != null)
+                    {
+                        lastSectPr.RemoveChild(oldPageSize);
+                    }
+                    lastSectPr.Append(pageSize);
+
+                    doc.Save(); // Guardamos los cambios
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Se produjo un error al cambiar la orientación del documento: {ex.Message}");
+            }
+        }
+
+        #endregion
+
+        #region Métodos que usan la librería de microsoft interop word
+        public static void CambiarOrientacionPaginaEnDocumento(string rutaArchivo, bool aHorizontal, string textoPie = "modificar")
+        {
+            Word.Application wordApp = null;
             Word.Document doc = null;
 
             try
             {
+                // Iniciar la aplicación Word.
+                wordApp = new Word.Application();
+
                 // Abrir el documento.
                 doc = wordApp.Documents.Open(rutaArchivo);
 
@@ -158,28 +228,23 @@ namespace funcionalidades_documento.crear_documento
                 newSection.Headers[Word.WdHeaderFooterIndex.wdHeaderFooterFirstPage].Range.Text = "";
                 newSection.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterFirstPage].Range.Text = "";
 
-                // Si el pie de página de la primera página tiene tablas, eliminarlas.
-                Word.HeaderFooter firstPageFooter = newSection.Footers[Word.WdHeaderFooterIndex.wdHeaderFooterFirstPage];
-                for (int tableIndex = firstPageFooter.Range.Tables.Count; tableIndex >= 1; tableIndex--)
-                {
-                    firstPageFooter.Range.Tables[tableIndex].Delete();
-                }
+                // Llamar al método para crear el pie de página personalizado.
+                EditarEncabezadoPie.CrearPieDePagina(newSection, textoPie); // Pie de página para las demás páginas
+                EditarEncabezadoPie.CrearPieDePagina(newSection, textoPie, true); // Pie de página para la primera página
 
-                // Guardar y cerrar el documento.
                 doc.Save();
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Ocurrió un error al cambiar la orientación de la página.", ex);
             }
             finally
             {
                 // Cerrar el documento y liberar recursos.
-                if (doc != null)
-                    doc.Close(Word.WdSaveOptions.wdDoNotSaveChanges);
-                wordApp.Quit();
+                if (doc != null) doc.Close(Word.WdSaveOptions.wdDoNotSaveChanges);
+                if (wordApp != null) wordApp.Quit();
             }
         }
-
-
-
-
 
         public static void ActualizarCamposEnWord(string rutaArchivo)
         {
@@ -224,7 +289,9 @@ namespace funcionalidades_documento.crear_documento
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(wordApp);
             }
         }
+        #endregion
 
+        #region Enumeraciones para los valores constantes
         /// <summary>
         /// Enum para los valores constantes de la decoracion de los textos
         /// </summary>
@@ -278,5 +345,7 @@ namespace funcionalidades_documento.crear_documento
             Vertical,
             Horizontal
         }
+        #endregion
+
     }
 }

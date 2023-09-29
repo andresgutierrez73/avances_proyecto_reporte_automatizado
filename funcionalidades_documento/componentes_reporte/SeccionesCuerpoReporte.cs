@@ -9,14 +9,15 @@ namespace funcionalidades_documento.componentes_reporte
 {
     public class SeccionesCuerpoReporte
     {
+        #region Métodos con la estructura del reporte
         public static void Objeto(string ruta)
         {
-			// Controlamos las excepciones
-			try
-			{
-				// Definicion de los titulos y parrafos
-				string titulo = "objeto";
-				string parrafo1 = "Presentar los procedimientos, criterios y resultados de los análisis efectuados para el diseño estructural de los pórticos metálicos requeridos para el cambio rápido del nuevo reactor de repuesto de 12.5 Mvar que será instalado en la subestación Banadía 230 kV, ubicada en el municipio de Saravena, en el departamento de Arauca.";
+            // Controlamos las excepciones
+            try
+            {
+                // Definicion de los titulos y parrafos
+                string titulo = "objeto";
+                string parrafo1 = "Presentar los procedimientos, criterios y resultados de los análisis efectuados para el diseño estructural de los pórticos metálicos requeridos para el cambio rápido del nuevo reactor de repuesto de 12.5 Mvar que será instalado en la subestación Banadía 230 kV, ubicada en el municipio de Saravena, en el departamento de Arauca.";
 
                 // Llamado a los métodos para editar el documento con la información
                 PropiedadesParrafo.AgregarTitulo(ruta, titulo.ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
@@ -574,5 +575,6 @@ namespace funcionalidades_documento.componentes_reporte
                 Console.WriteLine("Error al crear el documento de word" + ex.Message);
             }
         }
+        #endregion
     }
 }
