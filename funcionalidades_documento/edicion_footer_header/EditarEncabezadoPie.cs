@@ -230,6 +230,7 @@ namespace funcionalidades_documento.edicion_footer_header
         }
 
 
+
         /// <summary>
         /// Método que retorna un objeto de tipo Footer con un formato específico como en este caso que es un tabla personalizada con un texto
         /// </summary>
@@ -387,6 +388,13 @@ namespace funcionalidades_documento.edicion_footer_header
 
 
         #region Métodos que usan la librería microsoft interop word
+        /// <summary>
+        /// Método que inserta directamente en el documento de word un encabezado a partir de una sección del documento 
+        /// </summary>
+        /// <param name="section">Aquí se pasa una sección del documento en la cual se van a aplicar los cambios</param>
+        /// <param name="textoPie">Aquí se pasa un string con el texto que estará en el pie de página</param>
+        /// <param name="firstPage">Aquí se pasa un valor booleano en caso de que la primera página sea diferente</param>
+        /// <exception cref="ApplicationException"></exception>
         public static void CrearPieDePagina(Word.Section section, string textoPie, bool firstPage = false)
         {
             try
@@ -428,7 +436,74 @@ namespace funcionalidades_documento.edicion_footer_header
                 throw new ApplicationException("Ocurrió un error al crear el pie de página.", ex);
             }
         }
+
+
+        /// <summary>
+        /// Método en el cual se establece un encabezado que se inserta directamente en el documento de word a partir de una sección
+        /// </summary>
+        /// <param name="section">Aquí va la sección en la cual estará ubicado el encabezado</param>
+        /// <param name="preTitulo">Aquí se pasa un string con el valor del pre-título</param>
+        /// <param name="titulo">Aquí se pasa un string con el valor del título</param>
+        /// <exception cref="ApplicationException">Aquí está el manejo de expciones que puedne ocurrir si se combian encabezados generados por openxml</exception>
+        public static void CrearEncabezado(Word.Section section, string preTitulo, string titulo)
+        {
+            try
+            {
+                foreach (Word.HeaderFooter header in section.Headers)
+                {
+                    // Limpiar completamente el encabezado.
+                    header.Range.Text = "";
+
+                    // Eliminar todas las tablas existentes en el encabezado
+                    while (header.Range.Tables.Count > 0)
+                    {
+                        header.Range.Tables[1].Delete();
+                    }
+
+                    // Crear una tabla en el encabezado con 2 filas y 2 columnas
+                    Word.Table table = header.Range.Tables.Add(header.Range, 2, 2);
+
+                    // Formatear la tabla según sea necesario
+                    table.Borders[Word.WdBorderType.wdBorderBottom].LineStyle = Word.WdLineStyle.wdLineStyleSingle;
+                    table.Borders[Word.WdBorderType.wdBorderHorizontal].LineStyle = Word.WdLineStyle.wdLineStyleSingle;
+
+                    // Configuración y llenado de celdas
+                    Word.Cell cell1 = table.Cell(1, 1);
+                    cell1.Merge(table.Cell(1, 2)); // Combinar celdas de la primera fila
+                    cell1.Range.Text = preTitulo;
+                    cell1.Range.Font.Size = 9;
+                    cell1.Range.Font.Name = "Arial";
+
+                    Word.Cell cell2 = table.Cell(2, 1);
+                    cell2.Range.Text = titulo;
+                    cell2.Range.Font.Size = 9;
+                    cell2.Range.Font.Name = "Arial";
+                    cell2.Range.Font.Bold = 1; // Hacer el texto negrita
+
+                    Word.Cell cell3 = table.Cell(2, 2);
+                    Word.Range cellRange = cell3.Range;
+
+                    cellRange.Collapse(Word.WdCollapseDirection.wdCollapseStart);
+                    cellRange.Text = "Página ";
+                    cellRange.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+                    cellRange.Fields.Add(cellRange, Word.WdFieldType.wdFieldPage);
+
+                    cellRange.InsertAfter(" de ");
+                    cellRange.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+                    cellRange.Fields.Add(cellRange, Word.WdFieldType.wdFieldNumPages);
+                    cell3.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+                    cell3.Range.Font.Size = 9;
+                    cell3.Range.Font.Name = "Arial";
+                }
+            }
+            catch (Exception ex)
+            {
+                // Aquí puedes manejar la excepción o lanzarla nuevamente.
+                throw new ApplicationException("Ocurrió un error al crear el encabezado.", ex);
+            }
+        }
+
         #endregion
-        
+
     }
 }

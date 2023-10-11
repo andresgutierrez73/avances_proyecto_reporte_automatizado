@@ -8,6 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using funcionalidades_documento.edicion_footer_header;
+using System.Xml.Linq;
 
 namespace funcionalidades_documento.crear_documento
 {
@@ -122,6 +123,11 @@ namespace funcionalidades_documento.crear_documento
             }
         }
 
+        /// <summary>
+        /// En este método crear una secccion específica dentro dentro del documento para que a partir de este punto en en el que se implemente el método las hojas cambien de orientación
+        /// </summary>
+        /// <param name="ruta">Aquí va la ruta del documento de word</param>
+        /// <param name="orientacion">Este es un enum a partir del cual se pasa un valor que será leido en el método para daterminar cúal es el cambio de orientación a implementar</param>
         public static void CambiarOrientacion(string ruta, Orientacion orientacion)
         {
             try
@@ -186,11 +192,20 @@ namespace funcionalidades_documento.crear_documento
                 Console.WriteLine($"Se produjo un error al cambiar la orientación del documento: {ex.Message}");
             }
         }
-
         #endregion
 
         #region Métodos que usan la librería de microsoft interop word
-        public static void CambiarOrientacionPaginaEnDocumento(string rutaArchivo, bool aHorizontal, string textoPie = "modificar")
+        /// <summary>
+        /// Método para cambiar la orientación de las hojas de un documento a partir del punto en el cual se llame, este método al crear las secciones hace la implmentacion de otros dos métodos los cuales
+        /// retornar un encabezado y pie de página con el propósito de cada que se haga una instancia de este método se puedan tener valores personalizados dentro de los encabezados y pie de página
+        /// </summary>
+        /// <param name="rutaArchivo">Aquí va la ruta del documento de word</param>
+        /// <param name="aHorizontal">Aquí se pasa un valor booleano para determinar sí se hace un cambio de orientación horizontal o vertical</param>
+        /// <param name="textoPie">Aquí se pasa un string con el texto que tendrá el pie de página</param>
+        /// <param name="preTituloEncabezado">Aquí se pasa un string para personalizar el pre-título del encabezado</param>
+        /// <param name="tituloEncabezado">Aquí se pasa un string para personalizar el título del encabezado</param>
+        /// <exception cref="ApplicationException"></exception>
+        public static void CambiarOrientacionPaginaEnDocumento(string rutaArchivo, bool aHorizontal, string textoPie = "modificarPie", string preTituloEncabezado = "preTituloEncabezado", string tituloEncabezado = "tituloEncabezado")
         {
             Word.Application wordApp = null;
             Word.Document doc = null;
@@ -232,6 +247,14 @@ namespace funcionalidades_documento.crear_documento
                 EditarEncabezadoPie.CrearPieDePagina(newSection, textoPie); // Pie de página para las demás páginas
                 EditarEncabezadoPie.CrearPieDePagina(newSection, textoPie, true); // Pie de página para la primera página
 
+                // Crear el encabezado personalizado.
+                EditarEncabezadoPie.CrearEncabezado(newSection, preTituloEncabezado, tituloEncabezado);
+
+                // Actualizar los campos del documento.
+                doc.Repaginate();
+                doc.Fields.Update();
+
+                // Guardar los cambios.
                 doc.Save();
             }
             catch (Exception ex)
@@ -245,7 +268,12 @@ namespace funcionalidades_documento.crear_documento
                 if (wordApp != null) wordApp.Quit();
             }
         }
-
+        
+        /// <summary>
+        /// Método que funciona como complemento y debe insertarse al final de la creación del documento, este tiene la finalidad de refrescar todos los campos de word, para evitar la tarea manual por
+        /// parte del usuario para actualzar campos uno por uno
+        /// </summary>
+        /// <param name="rutaArchivo">Aquí se pasa la ruta del archivo</param>
         public static void ActualizarCamposEnWord(string rutaArchivo)
         {
             // Crear una nueva aplicación Word

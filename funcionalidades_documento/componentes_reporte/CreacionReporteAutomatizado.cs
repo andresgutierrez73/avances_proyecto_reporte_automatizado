@@ -5,6 +5,7 @@ using funcionalidades_documento.funciones_tablas;
 using funcionalidades_documento.edicion_footer_header;
 using System;
 using System.Collections.Generic;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace funcionalidades_documento.componentes_reporte
 {
@@ -37,6 +38,7 @@ namespace funcionalidades_documento.componentes_reporte
 
                 CreacionPortada(Ruta);
                 CreacionCuerpoInforme(Ruta);
+
             }
             catch (Exception ex)
             {
@@ -89,7 +91,7 @@ namespace funcionalidades_documento.componentes_reporte
                     new List<string> { "Nombres", "~", "Firma", "Matricula", "Total de paginas", "1006", "Fecha de Emisión", "2022.09.16",  },
                     new List<string> { "Elaboró", "c.castaño".ToUpper(), "[B64]" + firma1, "267773 ANT", "Nombre del proyecto", "~", "~", "~",  },
                     new List<string> { "Revisó", "c.metrio".ToUpper(), "[B64]" + firma2, "357197 ANT", "RENOVACIÓN SUBESTACIÓN BANADÍA 230 kV", "~", "~", "~",  },
-                    new List<string> { "Aprobó", "i.vullalba".ToUpper(), "[B64]" + firma3, "196375 ANT", "Código del Documento", "~", "~", "~",  },
+                    new List<string> { "Aprobó", "i.villalba".ToUpper(), "[B64]" + firma3, "196375 ANT", "Código del Documento", "~", "~", "~",  },
                     new List<string> { "|", "|", "|", "|", "CO-RBAN-14113-S-01-D1531", "~", "~", "~",  },
                 };
 
@@ -103,8 +105,8 @@ namespace funcionalidades_documento.componentes_reporte
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
                 PropiedadesTabla.AgregarTablaDesdeLista(ruta, datos);
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
-                EditarEncabezadoPie.EditarEncabezado(ruta, encabezadoAlto, encabezadoBajo, 2);
-                EditarEncabezadoPie.EditarPieDePagina(ruta, pie, datos3);
+                //EditarEncabezadoPie.EditarEncabezado(ruta, encabezadoAlto, encabezadoBajo, 2);
+                //EditarEncabezadoPie.EditarPieDePagina(ruta, pie, datos3);
                 PropiedadesParrafo.TablaContenido(ruta, "tabla de contenido".ToUpper());
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
                 PropiedadesParrafo.TablaTablas(ruta, "lista de tablas".ToUpper());
@@ -128,36 +130,35 @@ namespace funcionalidades_documento.componentes_reporte
             // Controlamos las excepciones del programa
             try
             {
+
                 //Llamado a los métodos que tienen el contenido del documento
                 SeccionesCuerpoReporte.Objeto(ruta);
                 SeccionesCuerpoReporte.Alcance(ruta);
                 SeccionesCuerpoReporte.DescripcionPorticos(ruta);
                 SeccionesCuerpoReporte.EspecificacionMateriales(ruta);
+                FuncionesCreacion.CambiarOrientacionPaginaEnDocumento(ruta, true);
                 SeccionesCuerpoReporte.CriteriosDiseno(ruta);
                 SeccionesCuerpoReporte.CriteriosDeflecciones(ruta);
                 SeccionesCuerpoReporte.Cargas(ruta);
                 SeccionesCuerpoReporte.PesoPropioEstructura(ruta);
                 SeccionesCuerpoReporte.CargasConexion(ruta);
                 SeccionesCuerpoReporte.CargasViento(ruta);
-                //FuncionesCreacion.CambiarOrientacionPaginaEnDocumento(ruta, true, "Archivo: CO-RBAN-14113-S-01-D1531");
-                FuncionesCreacion.CambiarOrientacion(ruta, FuncionesCreacion.Orientacion.Horizontal);
-                SeccionesCuerpoReporte.CargasSismo(ruta); 
+                SeccionesCuerpoReporte.CargasSismo(ruta);
                 SeccionesCuerpoReporte.CargasMontajeMantenimiento(ruta);
                 SeccionesCuerpoReporte.CombinacionesCarga(ruta);
                 SeccionesCuerpoReporte.NomenclaturaReporte(ruta);
-                FuncionesCreacion.CambiarOrientacion(ruta, FuncionesCreacion.Orientacion.Vertical);
                 PropiedadesParrafo.AgregarSaltoDePagina(ruta);
                 PropiedadesParrafo.AgregarTitulo(ruta, "referencias".ToUpper(), 1, 12, FuncionesCreacion.EstiloParrafo.Negrita, FuncionesCreacion.AlineacionTexto.Izquierda);
                 PropiedadesParrafo.AgregarSaltosDeLinea(ruta, 1);
-                //FuncionesCreacion.CambiarOrientacionPaginaEnDocumento(ruta, false, "Archivo: otro pie");
                 PropiedadesParrafo.InsertarBibliografia(ruta);
+
 
                 // Aquí se crea un ciclo el cual va a llamar al método que refresca los campos del documento dos veces
                 for (int i = 0; i < 2; i++)
                 {
                     FuncionesCreacion.ActualizarCamposEnWord(ruta);
                 }
-                
+
             }
             catch (Exception ex)
             {
